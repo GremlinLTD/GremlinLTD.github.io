@@ -1,0 +1,174 @@
+---
+title: "Security Practices"
+description: "SSH keys, 2FA, secrets management, and security hygiene"
+step: 8
+---
+
+We handle client infrastructure. Security isn't optional.
+
+## SSH Keys
+
+Generate an Ed25519 key if you don't already have one:
+
+```bash
+ssh-keygen -t ed25519 -C "your.name@gremlin.group"
+```
+
+Add it to the SSH agent:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+On macOS, add to your `~/.ssh/config` so it persists across reboots:
+
+```
+Host *
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+Add your public key to:
+- [GitHub](https://github.com/settings/keys) (both Authentication and Signing)
+- Any client systems you're given access to
+
+## Two-Factor Authentication
+
+Enable 2FA on everything. No exceptions.
+
+- **GitHub** - Required for org membership
+- **AWS** - Required for all IAM users
+- **Azure / GCP** - Required where available
+- **1Password** - Your master password + 2FA device
+
+Use a hardware key (YubiKey) or authenticator app. Avoid SMS-based 2FA.
+
+## 1Password
+
+We use [1Password](https://1password.com/) for team secrets management. You'll receive an invitation to the team vault.
+
+### CLI Integration
+
+The 1Password CLI lets you inject secrets into commands without exposing them:
+
+```bash
+brew install --cask 1password-cli
+```
+
+Sign in:
+
+```bash
+eval $(op signin)
+```
+
+Inject secrets into environment variables:
+
+```bash
+# Reference a secret from 1Password
+export API_KEY=$(op read "op://Private/API Key/credential")
+
+# Or use op run to inject into a command
+op run --env-file=.env.1p -- bun run dev
+```
+
+### .env Files
+
+Never commit `.env` files. Use `.env.example` with placeholder values:
+
+```bash
+# .env.example
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+API_KEY=your-api-key-here
+```
+
+For local development, create `.env` from the example and fill in real values from 1Password.
+
+## Secrets in Code
+
+### What NOT to commit
+
+- API keys, tokens, passwords
+- `.env` files with real values
+- Private keys or certificates
+- Client credentials or connection strings
+- Terraform state files containing secrets
+
+### Detection Tools
+
+We run [detect-secrets](https://github.com/Yelp/detect-secrets) and [trufflehog](https://github.com/trufflesecurity/trufflehog) to catch accidental commits:
+
+```bash
+# Scan for secrets in current directory
+detect-secrets scan
+
+# Scan git history for leaked secrets
+trufflehog git file://. --only-verified
+```
+
+Set up a pre-commit hook to scan before every commit:
+
+```bash
+# Using prek or pre-commit
+detect-secrets-hook --baseline .secrets.baseline
+```
+
+### git-crypt for Encrypted Files
+
+Some repos use [git-crypt](https://github.com/AGWA/git-crypt) to encrypt specific files in the repo:
+
+```bash
+brew install git-crypt
+
+# Unlock an existing repo (requires GPG key added to the repo)
+git-crypt unlock
+```
+
+### age for File Encryption
+
+For one-off file encryption, use [age](https://github.com/FiloSottile/age):
+
+```bash
+# Encrypt
+age -r age1... secret.txt > secret.txt.age
+
+# Decrypt
+age -d -i key.txt secret.txt.age > secret.txt
+```
+
+## AWS Credentials
+
+Never store long-lived AWS credentials in plain text. Use one of:
+
+**aws-vault** (recommended) - stores credentials in your OS keychain:
+
+```bash
+brew install --cask aws-vault
+
+# Add credentials
+aws-vault add staging
+
+# Run a command with temporary credentials
+aws-vault exec staging -- terraform plan
+```
+
+**AWS SSO** - if the client uses IAM Identity Center:
+
+```bash
+aws sso login --profile client-staging
+```
+
+## Client Security
+
+When working on client projects:
+
+- **Keep client data isolated.** Don't mix client credentials or data across projects.
+- **Use separate AWS profiles** per client.
+- **Follow the client's security policies** in addition to ours.
+- **Report incidents immediately.** If you suspect a credential leak or breach, tell your team lead right away. Speed matters.
+- **Clean up when you're done.** Revoke temporary credentials and remove local secrets when you roll off a project.
+
+## Next Steps
+
+Continue to [macOS for Developers](/onboarding/macos-setup/) to configure your system defaults.

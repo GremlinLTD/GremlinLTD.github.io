@@ -1,0 +1,153 @@
+---
+title: "macOS for Developers"
+description: "System settings, Xcode tools, and defaults that make development smoother"
+step: 9
+---
+
+The stuff everyone Googles on day one. Get it sorted now.
+
+## Xcode Command Line Tools
+
+Required for git, compilers, and most Homebrew packages:
+
+```bash
+xcode-select --install
+```
+
+## System Preferences
+
+### Keyboard
+
+Fast key repeat is essential for terminal work:
+
+```bash
+# Set key repeat rate (lower = faster)
+defaults write NSGlobalDomain KeyRepeat -int 2
+
+# Set delay until repeat (lower = shorter)
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+```
+
+Log out and back in for these to take effect.
+
+### Finder
+
+Show the things that matter:
+
+```bash
+# Show hidden files
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
+# Show file extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# Show path bar at bottom of Finder
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Show status bar
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# Default to list view
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+
+# Restart Finder to apply
+killall Finder
+```
+
+### Dock
+
+Keep it out of the way:
+
+```bash
+# Auto-hide the Dock
+defaults write com.apple.dock autohide -bool true
+
+# Remove the auto-hide delay
+defaults write com.apple.dock autohide-delay -float 0
+
+# Speed up the hide/show animation
+defaults write com.apple.dock autohide-time-modifier -float 0.3
+
+# Restart Dock
+killall Dock
+```
+
+### Screenshots
+
+Save to a specific folder instead of the desktop:
+
+```bash
+mkdir -p ~/Screenshots
+defaults write com.apple.screencapture location ~/Screenshots
+killall SystemUIServer
+```
+
+### Trackpad
+
+Enable tap to click (if you prefer it):
+
+```bash
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+```
+
+## Terminal Emulator
+
+We recommend [Ghostty](https://ghostty.org/) for its speed and native macOS feel:
+
+```bash
+brew install --cask ghostty
+```
+
+Alternatives: iTerm2, Alacritty, or the built-in Terminal.app.
+
+Configure your terminal font to a Nerd Font (see [Editor Setup](/onboarding/editor-setup/)):
+
+```bash
+brew install --cask font-jetbrains-mono-nerd-font
+```
+
+## File System
+
+### Developer Directory
+
+Keep a consistent project structure:
+
+```bash
+mkdir -p ~/git/gremlin    # Gremlin internal repos
+mkdir -p ~/git/clients    # Client project repos
+```
+
+### Case Sensitivity
+
+macOS uses a case-insensitive filesystem by default. This can cause issues with git repos that have files differing only in case. Be aware of it, but don't try to change it system-wide.
+
+## Homebrew Maintenance
+
+Keep your tools up to date:
+
+```bash
+# Update Homebrew and all packages
+brew update && brew upgrade
+
+# Or use topgrade to update everything at once
+brew install topgrade
+topgrade
+```
+
+Clean up old versions periodically:
+
+```bash
+brew cleanup
+```
+
+## Useful macOS Apps
+
+A few extras that make life easier:
+
+- **[Bartender](https://www.macbartender.com/)** - Tidy up the menu bar
+- **[Alfred](https://www.alfredapp.com/)** - Launcher and productivity tool (or use Spotlight)
+- **[Keka](https://www.keka.io/)** - Archive utility that handles everything
+
+## Next Steps
+
+Continue to [Troubleshooting](/onboarding/troubleshooting/) for solutions to common issues.

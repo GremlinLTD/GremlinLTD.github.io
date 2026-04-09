@@ -1,0 +1,120 @@
+---
+title: "Communication & Conventions"
+description: "How we communicate, collaborate across projects, and work with clients"
+step: 11
+---
+
+We're a hub of engineers working across multiple client projects and internal tools. Clear communication keeps everything running smoothly.
+
+## How We Work
+
+Most of the team is assigned to client projects at any given time. Some work on internal projects like our open source tools and infrastructure. Either way, the same conventions apply.
+
+### Client Projects
+
+- You'll be embedded in a client's team or working on their infrastructure
+- Follow the client's processes in addition to ours (their Jira, their Slack, their deploy process)
+- Keep your Gremlin team lead in the loop on progress and blockers
+- Client credentials and data stay isolated, never mix across projects
+
+### Internal Projects
+
+- We use GitHub Issues and Projects for tracking
+- PRs go through the standard review process
+- Deploy when ready, no gatekeeping, but use common sense
+
+## Communication Channels
+
+### Day-to-Day
+
+- **Slack / Teams** - quick questions, status updates, sharing links
+- **Huddles / calls** - anything that needs more than 3 messages to resolve
+- **GitHub PRs** - code discussion stays in the PR, not in chat
+
+### Escalation
+
+If something is urgent:
+
+1. Message your team lead directly
+2. If they're unavailable, post in the engineering channel with context
+3. For production incidents, follow the client's incident process
+
+### When to Communicate
+
+- **Starting work** - let the team know what you're picking up
+- **Blocked** - say so early, don't wait until the end of the day
+- **Finished** - post the PR link and tag a reviewer
+- **Leaving for the day** - quick status update if you have work in progress
+- **Going to be away** - let your team lead and client contact know in advance
+
+## Documentation
+
+### Write Things Down
+
+If you spent time figuring something out, document it. Future you (and the next person) will thank you.
+
+- **Runbooks** - how to deploy, how to debug, how to recover
+- **Architecture decisions** - why we chose X over Y, as an ADR or in the project wiki
+- **Setup instructions** - don't assume the next person has your context
+
+### Where to Document
+
+- **Project README** - setup, running, testing
+- **`docs/` folder** - architecture, decisions, runbooks
+- **This site** - guides and references that apply across projects
+- **Client's wiki** - client-specific documentation stays with the client
+
+## Meetings
+
+### Standups
+
+Quick, async or sync. Answer three questions:
+
+1. What did I do yesterday?
+2. What am I doing today?
+3. Am I blocked on anything?
+
+Keep it under 2 minutes per person. If something needs discussion, take it offline.
+
+### Retrospectives
+
+We run retros at the end of sprints or project milestones:
+
+- What went well?
+- What could be better?
+- What will we change?
+
+Be honest. Retros only work if people speak up.
+
+## Code Conventions
+
+### Naming
+
+- **Branches** - `feature/`, `bugfix/`, `hotfix/` prefix (see [Git Configuration](/onboarding/git-configuration/))
+- **Commits** - conventional commits (see [Conventional Commits guide](/guides/conventional-commits/))
+- **Variables** - descriptive, no abbreviations unless universally understood (`db` is fine, `cstmrSvc` is not)
+
+### Code Style
+
+- Use the project's linter and formatter. Don't fight it.
+- Format on save. No style debates in PRs.
+- Follow the existing patterns in the codebase. Consistency beats personal preference.
+
+### Pull Requests
+
+- Keep them small and focused
+- Write a description that explains why, not just what
+- Respond to review feedback within a working day
+- Don't let PRs sit open for more than 2-3 days
+
+## Working Hours
+
+We're flexible. The key principles:
+
+- **Overlap** - be available during core hours (roughly 10am-4pm UK) for collaboration
+- **Respect timezones** - if working with a client in a different timezone, agree on overlap hours
+- **Don't burn out** - sustainable pace matters more than heroic sprints
+
+## Next Steps
+
+Continue to [Learning Resources](/onboarding/learning-resources/) for curated links to deepen your knowledge.

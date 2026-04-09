@@ -1,0 +1,263 @@
+---
+title: "Troubleshooting"
+description: "Solutions to common issues you'll hit in your first few weeks"
+step: 10
+---
+
+Things break. Here's how to fix the ones that come up most often.
+
+## Git
+
+### "Permission denied (publickey)"
+
+Your SSH key isn't set up correctly with GitHub.
+
+```bash
+# Check your SSH connection
+ssh -T git@github.com
+
+# If it fails, check your key is loaded
+ssh-add -l
+
+# Add your key if it's not listed
+ssh-add ~/.ssh/id_ed25519
+```
+
+If it still fails, make sure your public key is added to [GitHub SSH Keys](https://github.com/settings/keys).
+
+### "Push rejected" / "Updates were rejected"
+
+Someone else pushed to the branch. Pull first:
+
+```bash
+git pull --rebase
+git push
+```
+
+If there are conflicts, resolve them, then:
+
+```bash
+git add .
+git rebase --continue
+git push
+```
+
+### "Detached HEAD"
+
+You checked out a commit or tag instead of a branch:
+
+```bash
+# See where you are
+git log --oneline -5
+
+# Create a branch from here if you want to keep changes
+git checkout -b feature/my-branch
+
+# Or go back to an existing branch
+git checkout develop
+```
+
+### Pre-commit Hook Failures
+
+If prek or pre-commit blocks your commit:
+
+```bash
+# See what failed
+git status
+
+# Fix the issues, then try again
+git add .
+git commit -m "feat: your message"
+```
+
+Don't use `--no-verify` to skip hooks unless you have a very good reason.
+
+## Docker / OrbStack
+
+### "Cannot connect to Docker daemon"
+
+Docker isn't running. Start OrbStack or Docker Desktop:
+
+```bash
+# OrbStack
+open -a OrbStack
+
+# Docker Desktop
+open -a Docker
+```
+
+### "No space left on device"
+
+Clean up unused images and containers:
+
+```bash
+docker system prune -a
+
+# See what's using space
+docker system df
+```
+
+### "Port already in use"
+
+Find and kill the process using the port:
+
+```bash
+lsof -i :3000
+kill -9 <PID>
+```
+
+## Kubernetes
+
+### "Unable to connect to the server"
+
+Your kubeconfig is wrong or the cluster is unreachable:
+
+```bash
+# Check current context
+kubectl config current-context
+
+# List available contexts
+kubectl config get-contexts
+
+# Switch context
+kubectl config use-context staging
+
+# Test connection
+kubectl cluster-info
+```
+
+If using AWS EKS, your credentials might have expired:
+
+```bash
+aws sso login --profile staging
+# or
+aws-vault exec staging -- kubectl get nodes
+```
+
+### "Error from server (Forbidden)"
+
+You don't have permission. Check your role:
+
+```bash
+kubectl auth can-i get pods
+kubectl auth whoami
+```
+
+Talk to your team lead if you need elevated access.
+
+### Pods Stuck in CrashLoopBackOff
+
+```bash
+# Check the logs
+kubectl logs <pod-name> --previous
+
+# Describe the pod for events
+kubectl describe pod <pod-name>
+
+# Use stern for live tailing
+stern <pod-name-prefix>
+```
+
+### Pods Stuck in Pending
+
+Usually a resource issue:
+
+```bash
+# Check events
+kubectl describe pod <pod-name>
+
+# Check node resources
+kubectl top nodes
+```
+
+Common causes: insufficient CPU/memory, no matching nodes for node selectors, PVC not bound.
+
+## Terraform
+
+### "State lock"
+
+Someone else (or a crashed process) holds the lock:
+
+```bash
+# Check who holds the lock
+terraform force-unlock <LOCK_ID>
+```
+
+Only use `force-unlock` if you're sure no other process is running. Check with the team first.
+
+### "Provider not found"
+
+Run init to download providers:
+
+```bash
+terraform init
+```
+
+If you've switched Terraform versions:
+
+```bash
+terraform init -upgrade
+```
+
+### "Error acquiring state lock" with DynamoDB
+
+The lock table might have a stale entry. Check the DynamoDB table in the AWS console, or:
+
+```bash
+aws dynamodb scan --table-name terraform-locks --region eu-west-1
+```
+
+## AWS
+
+### "ExpiredToken" / "The security token included in the request is expired"
+
+Your session has expired:
+
+```bash
+# SSO
+aws sso login --profile staging
+
+# aws-vault
+aws-vault exec staging -- <command>
+```
+
+### "Access Denied"
+
+Check you're using the right profile:
+
+```bash
+aws sts get-caller-identity
+aws sts get-caller-identity --profile staging
+```
+
+## Homebrew
+
+### "Error: No available formula"
+
+Update Homebrew first:
+
+```bash
+brew update
+brew install <package>
+```
+
+### Broken After macOS Update
+
+Reinstall Xcode CLI tools and rebuild:
+
+```bash
+xcode-select --install
+brew update
+brew upgrade
+```
+
+## Still Stuck?
+
+1. **Search the error message** - someone has almost certainly hit it before
+2. **Check the tool's docs** - most tools have a troubleshooting section
+3. **Ask in the team chat** - include the full error message and what you've tried
+4. **Don't spend more than 30 minutes** stuck on the same issue before asking for help
+
+## Next Steps
+
+Continue to [Communication & Conventions](/onboarding/communication/) to learn how we work together across projects.

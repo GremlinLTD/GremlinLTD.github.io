@@ -1,0 +1,153 @@
+---
+title: "Editor Setup"
+description: "Configure your code editor with the right extensions, settings, and language support"
+step: 7
+---
+
+Your editor is where you spend most of your time. Getting it configured properly pays off quickly.
+
+## Recommended Editors
+
+We don't mandate a specific editor, but most of the team uses one of these:
+
+- **[VS Code](https://code.visualstudio.com/)** - Most popular, huge extension ecosystem
+- **[Zed](https://zed.dev/)** - Fast, Rust-based, built-in AI features
+- **[Neovim](https://neovim.io/)** - Terminal-based, highly customisable
+
+## VS Code Setup
+
+### Essential Extensions
+
+Install these regardless of what languages you work with:
+
+```bash
+# Core
+code --install-extension EditorConfig.EditorConfig
+code --install-extension eamodio.gitlens
+code --install-extension github.copilot
+code --install-extension github.copilot-chat
+
+# Formatting & Linting
+code --install-extension biomejs.biome
+code --install-extension charliermarsh.ruff
+code --install-extension timonwong.shellcheck
+
+# Infrastructure
+code --install-extension hashicorp.terraform
+code --install-extension redhat.vscode-yaml
+code --install-extension ms-kubernetes-tools.vscode-kubernetes-tools
+
+# Containers
+code --install-extension ms-azuretools.vscode-docker
+```
+
+### Language-Specific Extensions
+
+Install based on the project you're working on:
+
+```bash
+# TypeScript / JavaScript
+code --install-extension astro-build.astro-vscode
+
+# Python
+code --install-extension ms-python.python
+code --install-extension ms-python.vscode-pylance
+
+# Rust
+code --install-extension rust-lang.rust-analyzer
+
+# Go
+code --install-extension golang.Go
+```
+
+### Recommended Settings
+
+Add to your VS Code `settings.json`:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.rulers": [80, 120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "trailing",
+  "editor.stickyScroll.enabled": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+  }
+}
+```
+
+## Zed Setup
+
+Zed works well out of the box. Key settings to adjust in `~/.config/zed/settings.json`:
+
+```json
+{
+  "theme": "One Dark",
+  "buffer_font_family": "JetBrains Mono",
+  "buffer_font_size": 14,
+  "format_on_save": "on",
+  "tab_size": 2,
+  "preferred_line_length": 120,
+  "show_whitespaces": "trailing",
+  "terminal": {
+    "font_family": "JetBrains Mono",
+    "font_size": 13
+  }
+}
+```
+
+Zed has built-in support for TypeScript, Python, Rust, and Go. Install language servers as needed through the extensions panel.
+
+## Fonts
+
+We recommend [Nerd Fonts](https://www.nerdfonts.com/) for terminal and editor use. They include icons used by Starship and other tools:
+
+```bash
+brew install --cask font-jetbrains-mono-nerd-font
+brew install --cask font-fira-code-nerd-font
+```
+
+Set your terminal and editor font to "JetBrainsMono Nerd Font" or "FiraCode Nerd Font".
+
+## EditorConfig
+
+Most of our repos include an `.editorconfig` file. This ensures consistent formatting regardless of editor. A typical config:
+
+```ini
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+[*.{ts,tsx,js,jsx,json,yaml,yml,astro}]
+indent_style = space
+indent_size = 2
+
+[*.{py}]
+indent_style = space
+indent_size = 4
+
+[*.{go}]
+indent_style = tab
+
+[Makefile]
+indent_style = tab
+```
+
+## Next Steps
+
+Continue to [Security Practices](/onboarding/security-practices/) to set up SSH keys, 2FA, and secrets management.
