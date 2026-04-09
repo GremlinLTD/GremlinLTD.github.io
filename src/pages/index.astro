@@ -1,9 +1,137 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { fetchPublicRepos } from '../lib/github';
+import { loadTools } from '../lib/github';
+import { getCollection } from 'astro:content';
+
+const repos = await fetchPublicRepos();
+const tools = loadTools();
+const guides = await getCollection('guides');
+const onboarding = await getCollection('onboarding');
 ---
-<BaseLayout title="Home">
-  <div class="container" style="padding: var(--space-3xl) 0;">
-    <h1>Gremlin LTD</h1>
-    <p>Coming soon.</p>
-  </div>
+<BaseLayout title="Home" description="Gremlin LTD - Open source projects, recommended tools, and engineering guides.">
+  <section class="hero">
+    <div class="container">
+      <h1>Open Source & Resources</h1>
+      <p class="hero-tagline">Our public projects, tooling recommendations, and engineering guides. Technical excellence without the jargon.</p>
+    </div>
+  </section>
+
+  <section class="stats container">
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="stat-number">{repos.length}</span>
+        <span class="stat-label">Public Repos</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">{tools.length}</span>
+        <span class="stat-label">Recommended Tools</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">{guides.length}</span>
+        <span class="stat-label">Guides</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">{onboarding.length}</span>
+        <span class="stat-label">Onboarding Steps</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sections container">
+    <div class="sections-grid">
+      <a href="/projects/" class="section-card">
+        <h2>Projects</h2>
+        <p>Open source tools, libraries, and infrastructure components from our team.</p>
+      </a>
+      <a href="/tools/" class="section-card">
+        <h2>Tools</h2>
+        <p>Developer tools we use daily. Battle-tested, worth installing.</p>
+      </a>
+      <a href="/guides/" class="section-card">
+        <h2>Guides</h2>
+        <p>Cheatsheets, references, and things we wish we'd written down sooner.</p>
+      </a>
+      <a href="/onboarding/" class="section-card">
+        <h2>Onboarding</h2>
+        <p>Everything you need to get set up and shipping.</p>
+      </a>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--deep-midnight) 0%, #2a3350 100%);
+    color: white;
+    padding: var(--space-4xl) 0;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+  }
+  .hero-tagline {
+    color: var(--electric-teal);
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .stats {
+    padding: var(--space-2xl) 0;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-lg);
+    text-align: center;
+  }
+  .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--electric-teal);
+  }
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+  .sections {
+    padding: 0 0 var(--space-4xl);
+  }
+  .sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-lg);
+  }
+  .section-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--space-xl);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .section-card:hover {
+    border-color: var(--electric-teal);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .section-card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--color-text);
+  }
+  .section-card p {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 2rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
