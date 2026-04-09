@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { loadTools } from '../lib/github';
+
+const tools = loadTools();
+
+const categories = [...new Set(tools.map(t => t.category))];
+const toolsByCategory = categories.map(cat => ({
+  name: cat,
+  tools: tools.filter(t => t.category === cat),
+}));
+---
+<BaseLayout title="Tools" description="Recommended developer tools from the Gremlin LTD team">
+  <div class="container page-section">
+    <h1>Recommended Tools</h1>
+    <p class="page-lead">Tools we use daily. Battle-tested, worth installing.</p>
+
+    {toolsByCategory.map(category => (
+      <section class="tool-category">
+        <h2>{category.name}</h2>
+        <div class="tools-grid">
+          {category.tools.map(tool => (
+            <ToolCard
+              name={tool.name}
+              description={tool.description}
+              url={tool.url}
+              install={tool.install}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.getAttribute('data-copy');
+      if (text) {
+        navigator.clipboard.writeText(text);
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+      }
+    });
+  });
+</script>
+
+<style>
+  .page-section {
+    padding: var(--space-3xl) 0;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+  }
+  .page-lead {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+    margin-bottom: var(--space-2xl);
+  }
+  .tool-category {
+    margin-bottom: var(--space-2xl);
+  }
+  .tool-category h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--space-lg);
+    color: var(--color-text);
+  }
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+  }
+</style>

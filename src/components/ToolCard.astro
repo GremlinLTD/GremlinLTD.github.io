@@ -1,0 +1,74 @@
+---
+interface Props {
+  name: string;
+  description: string;
+  url: string;
+  install: string;
+}
+
+const { name, description, url, install } = Astro.props;
+---
+<div class="tool-card">
+  <div class="tool-header">
+    <a href={url} target="_blank" rel="noopener" class="tool-name">{name}</a>
+  </div>
+  <p class="tool-desc">{description}</p>
+  <div class="tool-install">
+    <code>{install}</code>
+    <button class="copy-btn" data-copy={install} aria-label={`Copy install command for ${name}`} type="button">
+      Copy
+    </button>
+  </div>
+</div>
+
+<style>
+  .tool-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--space-lg);
+  }
+  .tool-name {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--color-text);
+  }
+  .tool-name:hover {
+    color: var(--electric-teal);
+  }
+  .tool-desc {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin: var(--space-sm) 0 var(--space-md);
+  }
+  .tool-install {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: var(--space-sm) var(--space-md);
+    overflow-x: auto;
+  }
+  .tool-install code {
+    font-size: 0.8rem;
+    flex: 1;
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+  }
+  .copy-btn {
+    font-size: 0.75rem;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .copy-btn:hover {
+    border-color: var(--electric-teal);
+    color: var(--electric-teal);
+  }
+</style>
