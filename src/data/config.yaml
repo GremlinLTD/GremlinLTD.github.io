@@ -276,3 +276,195 @@ tools:
     url: https://docs.cocogitto.io
     install: "brew install cocogitto"
     category: Git & Workflow
+
+  - name: git-cliff
+    description: Generate changelogs from conventional commits
+    url: https://git-cliff.org
+    install: "brew install git-cliff"
+    category: Git & Workflow
+
+  - name: git-lfs
+    description: Git extension for versioning large files
+    url: https://git-lfs.com
+    install: "brew install git-lfs"
+    category: Git & Workflow
+
+  # Infrastructure (additional)
+
+  - name: ansible
+    description: Agentless IT automation for configuration management and deployment
+    url: https://www.ansible.com
+    install: "brew install ansible"
+    category: Infrastructure
+
+  - name: packer
+    description: Build automated machine images across multiple platforms
+    url: https://www.packer.io
+    install: "brew install packer"
+    category: Infrastructure
+
+  - name: localstack
+    description: Local AWS cloud stack for development and testing
+    url: https://localstack.cloud
+    install: "brew install localstack"
+    category: Infrastructure
+
+  - name: cf2tf
+    description: Convert CloudFormation templates to Terraform
+    url: https://github.com/DontShaveTheYak/cf2tf
+    install: "brew install cf2tf"
+    category: Infrastructure
+
+  # Kubernetes (additional)
+
+  - name: linkerd
+    description: Lightweight service mesh for Kubernetes
+    url: https://linkerd.io
+    install: "brew install linkerd"
+    category: Kubernetes
+
+  - name: cilium-cli
+    description: CLI for Cilium, eBPF-based Kubernetes networking and security
+    url: https://cilium.io
+    install: "brew install cilium-cli"
+    category: Kubernetes
+
+  - name: kompose
+    description: Convert Docker Compose files to Kubernetes manifests
+    url: https://kompose.io
+    install: "brew install kompose"
+    category: Kubernetes
+
+  - name: kubelogin
+    description: Kubernetes OIDC authentication plugin for kubectl
+    url: https://github.com/int128/kubelogin
+    install: "brew install kubelogin"
+    category: Kubernetes
+
+  - name: helm-docs
+    description: Auto-generate documentation for Helm charts
+    url: https://github.com/norwoodj/helm-docs
+    install: "brew install helm-docs"
+    category: Kubernetes
+
+  - name: talosctl
+    description: CLI for Talos Linux, the Kubernetes-focused OS
+    url: https://www.talos.dev
+    install: "brew install talosctl"
+    category: Kubernetes
+
+  # Code Quality (additional)
+
+  - name: golangci-lint
+    description: Fast, configurable Go linter aggregator
+    url: https://golangci-lint.run
+    install: "brew install golangci-lint"
+    category: Code Quality
+
+  - name: yamlfmt
+    description: Extensible YAML formatter from Google
+    url: https://github.com/google/yamlfmt
+    install: "brew install yamlfmt"
+    category: Code Quality
+
+  # Security (additional)
+
+  - name: nmap
+    description: Network exploration and security auditing tool
+    url: https://nmap.org
+    install: "brew install nmap"
+    category: Security
+
+  - name: wireguard-tools
+    description: Tools for the WireGuard VPN protocol
+    url: https://www.wireguard.com
+    install: "brew install wireguard-tools"
+    category: Security
+
+  # General Utilities (additional)
+
+  - name: topgrade
+    description: Upgrade everything on your system with a single command
+    url: https://github.com/topgrade-rs/topgrade
+    install: "brew install topgrade"
+    category: General Utilities
+
+  - name: glances
+    description: Cross-platform system monitoring tool (better top)
+    url: https://nicolargo.github.io/glances/
+    install: "brew install glances"
+    category: General Utilities
+
+  - name: aria2
+    description: Lightweight multi-protocol download utility with resuming
+    url: https://aria2.github.io
+    install: "brew install aria2"
+    category: General Utilities
+
+  - name: asciinema
+    description: Record and share terminal sessions
+    url: https://asciinema.org
+    install: "brew install asciinema"
+    category: General Utilities
+
+  # Desktop Apps
+
+  - name: ghostty
+    description: Fast, native terminal emulator with GPU rendering
+    url: https://ghostty.org
+    install: "brew install --cask ghostty"
+    category: Desktop Apps
+
+  - name: orbstack
+    description: Fast, lightweight Docker Desktop alternative for macOS
+    url: https://orbstack.dev
+    install: "brew install --cask orbstack"
+    category: Desktop Apps
+
+  - name: bruno
+    description: Open source API client, alternative to Postman
+    url: https://www.usebruno.com
+    install: "brew install --cask bruno"
+    category: Desktop Apps
+
+  - name: tableplus
+    description: Modern, native database management GUI
+    url: https://tableplus.com
+    install: "brew install --cask tableplus"
+    category: Desktop Apps
+
+  - name: dash
+    description: Offline API documentation browser with instant search
+    url: https://kapeli.com/dash
+    install: "brew install --cask dash"
+    category: Desktop Apps
+
+  - name: obsidian
+    description: Knowledge base and note-taking with Markdown and linking
+    url: https://obsidian.md
+    install: "brew install --cask obsidian"
+    category: Desktop Apps
+
+  - name: zed
+    description: High-performance code editor built in Rust
+    url: https://zed.dev
+    install: "brew install --cask zed"
+    category: Desktop Apps
+
+  - name: drawio
+    description: Diagramming tool for architecture and flow diagrams
+    url: https://www.drawio.com
+    install: "brew install --cask drawio"
+    category: Desktop Apps
+
+  - name: 1password-cli
+    description: Manage 1Password vaults and secrets from the terminal
+    url: https://developer.1password.com/docs/cli/
+    install: "brew install --cask 1password-cli"
+    category: Security
+
+  - name: aws-vault
+    description: Securely store and access AWS credentials in your OS keychain
+    url: https://github.com/99designs/aws-vault
+    install: "brew install --cask aws-vault"
+    category: Cloud CLIs
