@@ -1,0 +1,82 @@
+---
+interface Props {
+  name: string;
+  description: string | null;
+  url: string;
+  homepage: string | null;
+  language: string | null;
+  stars: number;
+  updatedAt: string;
+}
+
+const { name, description, url, homepage, language, stars, updatedAt } = Astro.props;
+
+const updated = new Date(updatedAt).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+<a href={url} target="_blank" rel="noopener" class="project-card">
+  <div class="project-card-header">
+    <h3>{name}</h3>
+    {homepage && (
+      <a href={homepage} target="_blank" rel="noopener" class="demo-link" onclick="event.stopPropagation()">
+        Live Demo
+      </a>
+    )}
+  </div>
+  {description && <p class="project-desc">{description}</p>}
+  <div class="project-meta">
+    {language && <span class="project-lang">{language}</span>}
+    {stars > 0 && <span class="project-stars">{stars} stars</span>}
+    <span class="project-updated">Updated {updated}</span>
+  </div>
+</a>
+
+<style>
+  .project-card {
+    display: block;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--space-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .project-card:hover {
+    border-color: var(--electric-teal);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+  }
+  .project-card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .demo-link {
+    font-size: 0.75rem;
+    color: var(--electric-teal);
+    border: 1px solid var(--electric-teal);
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+  }
+  .project-desc {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-md);
+  }
+  .project-meta {
+    display: flex;
+    gap: var(--space-md);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+</style>

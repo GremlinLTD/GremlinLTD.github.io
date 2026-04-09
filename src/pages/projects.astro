@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { fetchPublicRepos } from '../lib/github';
+
+const repos = await fetchPublicRepos();
+---
+<BaseLayout title="Projects" description="Open source projects from Gremlin LTD">
+  <div class="container page-section">
+    <h1>Projects</h1>
+    <p class="page-lead">Our open source work. Tools, libraries, and infrastructure components.</p>
+
+    <div class="projects-grid">
+      {repos.map(repo => (
+        <ProjectCard
+          name={repo.name}
+          description={repo.description}
+          url={repo.html_url}
+          homepage={repo.homepage}
+          language={repo.language}
+          stars={repo.stargazers_count}
+          updatedAt={repo.updated_at}
+        />
+      ))}
+    </div>
+
+    {repos.length === 0 && (
+      <p class="empty-state">No projects found. Check back soon.</p>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-section {
+    padding: var(--space-3xl) 0;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+  }
+  .page-lead {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+    margin-bottom: var(--space-2xl);
+  }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+  }
+  .empty-state {
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: var(--space-3xl) 0;
+  }
+</style>
