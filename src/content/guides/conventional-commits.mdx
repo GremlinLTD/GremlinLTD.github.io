@@ -1,0 +1,79 @@
+---
+title: "Conventional Commits Cheatsheet"
+description: "Our take on commit types, scopes, and examples. Keep your git history clean and useful."
+date: 2026-04-10
+tags: ["git", "workflow"]
+---
+
+A quick reference for writing consistent, meaningful commit messages. Based on the [Conventional Commits](https://www.conventionalcommits.org/) spec with our own additions.
+
+## Format
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+## Types
+
+| Type | When to use | Example |
+|------|------------|---------|
+| `feat` | New feature | `feat(auth): add SSO login` |
+| `fix` | Bug fix | `fix(api): handle null response from upstream` |
+| `docs` | Documentation only | `docs: update API examples in README` |
+| `style` | Formatting, no code change | `style: fix indentation in config` |
+| `refactor` | Code change that neither fixes nor adds | `refactor(db): extract query builder` |
+| `perf` | Performance improvement | `perf(search): add index on user_email` |
+| `test` | Adding or fixing tests | `test(auth): add login flow integration tests` |
+| `chore` | Build, CI, tooling | `chore: update GitHub Actions to v4` |
+| `ci` | CI/CD changes | `ci: add nightly build schedule` |
+| `build` | Build system or dependencies | `build: upgrade Astro to 5.x` |
+| `revert` | Reverting a previous commit | `revert: undo feat(auth) SSO login` |
+
+## Scopes
+
+Scopes are optional but useful. Use the area of the codebase being changed:
+
+- `auth`, `api`, `ui`, `db`, `config`, `ci`, `deps`
+- Keep them short, consistent, and lowercase
+
+## Breaking Changes
+
+Add `!` after the type/scope or use the `BREAKING CHANGE:` footer:
+
+```
+feat(api)!: change authentication to OAuth2
+
+BREAKING CHANGE: API key authentication is no longer supported.
+All clients must migrate to OAuth2 tokens.
+```
+
+## Good Commit Messages
+
+- Start with lowercase after the colon
+- Use imperative mood ("add" not "added" or "adds")
+- Keep the first line under 72 characters
+- Use the body for "why", not "what" (the diff shows what)
+
+## Examples
+
+```
+feat(projects): add star count to project cards
+
+Show GitHub star count on each project card to help
+visitors gauge project popularity at a glance.
+```
+
+```
+fix(nav): prevent menu staying open after navigation
+
+The mobile hamburger menu remained open when clicking
+a nav link. Now closes on any link click.
+```
+
+```
+chore(deps): update astro to 5.2.0
+```

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const guides = (await getCollection('guides')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+---
+<BaseLayout title="Guides" description="Engineering guides, cheatsheets, and reference material from Gremlin LTD">
+  <div class="container page-section">
+    <h1>Guides</h1>
+    <p class="page-lead">Cheatsheets, references, and things we wish we'd written down sooner.</p>
+
+    <div class="guides-list">
+      {guides.map(guide => (
+        <a href={`/guides/${guide.id}/`} class="guide-item">
+          <h3>{guide.data.title}</h3>
+          <p>{guide.data.description}</p>
+          <div class="guide-item-meta">
+            <time datetime={guide.data.date.toISOString()}>
+              {guide.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </time>
+            {guide.data.tags.length > 0 && (
+              <div class="guide-item-tags">
+                {guide.data.tags.map(tag => <span class="tag">{tag}</span>)}
+              </div>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-section { padding: var(--space-3xl) 0; }
+  h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: var(--space-sm); }
+  .page-lead { color: var(--color-text-secondary); font-size: 1.125rem; margin-bottom: var(--space-2xl); }
+  .guides-list { display: flex; flex-direction: column; gap: var(--space-md); }
+  .guide-item {
+    display: block;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: var(--space-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s;
+  }
+  .guide-item:hover { border-color: var(--electric-teal); text-decoration: none; }
+  .guide-item h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-xs); color: var(--color-text); }
+  .guide-item p { color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: var(--space-sm); }
+  .guide-item-meta { display: flex; align-items: center; gap: var(--space-md); font-size: 0.75rem; color: var(--color-text-muted); }
+  .guide-item-tags { display: flex; gap: var(--space-xs); }
+  .tag { font-size: 0.7rem; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 3px; padding: 0.1rem 0.4rem; }
+</style>

@@ -1,0 +1,52 @@
+---
+title: "Getting Started"
+description: "Prerequisites and first steps for new team members"
+step: 1
+---
+
+Welcome to Gremlin LTD. Let's get you set up.
+
+## Prerequisites
+
+Before you start, make sure you have:
+
+- macOS, Linux, or WSL2 on Windows
+- A GitHub account added to the [GremlinLTD](https://github.com/GremlinLTD) org
+- Terminal access (iTerm2, Alacritty, or the built-in terminal)
+
+## First Steps
+
+1. **Install Homebrew** (macOS/Linux):
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+2. **Install core tools:**
+
+```bash
+brew install bun starship jq yq git
+```
+
+3. **Set up your shell:**
+
+Add to your shell config (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+eval "$(starship init zsh)"
+```
+
+4. **Clone this site** to verify everything works:
+
+```bash
+git clone git@github.com:GremlinLTD/GremlinLTD.github.io.git
+cd GremlinLTD.github.io
+bun install
+bun run dev
+```
+
+If you see the site running locally, you're good to go.
+
+## Next Steps
+
+Check out the [Recommended Tools](/tools/) page for the full list of tools we use, and the [Conventional Commits](/guides/conventional-commits/) guide for our commit message format.

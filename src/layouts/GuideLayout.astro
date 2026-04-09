@@ -1,0 +1,131 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date?: Date;
+  tags?: string[];
+  backLink: string;
+  backLabel: string;
+}
+
+const { title, description, date, tags, backLink, backLabel } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <article class="container guide-article">
+    <a href={backLink} class="back-link">&larr; {backLabel}</a>
+    <h1>{title}</h1>
+    {date && (
+      <time class="guide-date" datetime={date.toISOString()}>
+        {date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+      </time>
+    )}
+    {tags && tags.length > 0 && (
+      <div class="guide-tags">
+        {tags.map(tag => <span class="tag">{tag}</span>)}
+      </div>
+    )}
+    <div class="guide-content">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .guide-article {
+    padding: var(--space-3xl) 0;
+    max-width: 800px;
+  }
+  .back-link {
+    display: inline-block;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+  }
+  .back-link:hover {
+    color: var(--electric-teal);
+    text-decoration: none;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+  }
+  .guide-date {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-sm);
+  }
+  .guide-tags {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-2xl);
+  }
+  .tag {
+    font-size: 0.75rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+    color: var(--color-text-muted);
+  }
+  .guide-content {
+    line-height: 1.7;
+  }
+  .guide-content :global(h2) {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: var(--space-2xl) 0 var(--space-md);
+  }
+  .guide-content :global(h3) {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: var(--space-xl) 0 var(--space-sm);
+  }
+  .guide-content :global(p) {
+    margin-bottom: var(--space-md);
+    color: var(--color-text-secondary);
+  }
+  .guide-content :global(pre) {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: var(--space-md);
+    overflow-x: auto;
+    margin-bottom: var(--space-md);
+    font-size: 0.875rem;
+  }
+  .guide-content :global(code:not(pre code)) {
+    background: var(--color-bg-secondary);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.875em;
+  }
+  .guide-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-md);
+    font-size: 0.875rem;
+  }
+  .guide-content :global(th),
+  .guide-content :global(td) {
+    border: 1px solid var(--color-border);
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+  }
+  .guide-content :global(th) {
+    background: var(--color-bg-secondary);
+    font-weight: 600;
+  }
+  .guide-content :global(ul),
+  .guide-content :global(ol) {
+    margin-bottom: var(--space-md);
+    padding-left: var(--space-xl);
+    color: var(--color-text-secondary);
+  }
+  .guide-content :global(li) {
+    margin-bottom: var(--space-xs);
+  }
+</style>

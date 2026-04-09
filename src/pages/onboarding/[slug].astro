@@ -1,0 +1,23 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const steps = await getCollection('onboarding');
+  return steps.map(step => ({
+    params: { slug: step.id },
+    props: { step },
+  }));
+}
+
+const { step } = Astro.props;
+const { Content } = await render(step);
+---
+<GuideLayout
+  title={step.data.title}
+  description={step.data.description}
+  backLink="/onboarding/"
+  backLabel="All Steps"
+>
+  <Content />
+</GuideLayout>
