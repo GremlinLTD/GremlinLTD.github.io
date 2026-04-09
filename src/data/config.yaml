@@ -108,7 +108,7 @@ tools:
   # Infrastructure
 
   - name: pulumi
-    description: Infrastructure as code using real programming languages
+    description: Infrastructure as code with TypeScript and Python, used for client projects
     url: https://www.pulumi.com
     install: "brew install pulumi"
     category: Infrastructure

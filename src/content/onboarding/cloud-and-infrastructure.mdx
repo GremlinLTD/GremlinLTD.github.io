@@ -102,23 +102,31 @@ Never run `terraform apply` in production without a reviewed plan. Use CI/CD for
 
 ## Pulumi
 
-Some of our infrastructure uses [Pulumi](https://www.pulumi.com/) with Python. Install it:
+Some of our infrastructure uses [Pulumi](https://www.pulumi.com/) with TypeScript and Python. These are mainly used for client projects, so you'll set up the specific stack when you're assigned to one.
 
 ```bash
 brew install pulumi
-
-# Set up Python with uv
-brew install uv
 ```
 
-For Pulumi projects:
+For TypeScript Pulumi projects:
 
 ```bash
 cd infra/
-uv sync          # install Python dependencies
-pulumi preview   # preview changes
-pulumi up        # apply changes
+bun install        # install dependencies
+pulumi preview     # preview changes
+pulumi up          # apply changes
 ```
+
+For Python Pulumi projects:
+
+```bash
+cd infra/
+uv sync            # install Python dependencies
+pulumi preview     # preview changes
+pulumi up          # apply changes
+```
+
+Your team lead will walk you through the specific client project setup, including which Pulumi backend and cloud credentials to use.
 
 ## Docker
 
