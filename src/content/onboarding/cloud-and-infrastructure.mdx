@@ -1,0 +1,151 @@
+---
+title: "Cloud & Infrastructure"
+description: "Set up AWS CLI, Terraform, and infrastructure tooling"
+step: 5
+---
+
+We manage infrastructure as code. Here's how to get your cloud tooling ready.
+
+## AWS CLI
+
+Install the AWS CLI:
+
+```bash
+brew install awscli
+```
+
+Configure your credentials (you'll receive an IAM user or SSO details from a team lead):
+
+```bash
+aws configure
+```
+
+Or for SSO:
+
+```bash
+aws configure sso
+```
+
+Verify access:
+
+```bash
+aws sts get-caller-identity
+```
+
+### Multiple Profiles
+
+If you work across multiple AWS accounts, use named profiles in `~/.aws/config`:
+
+```ini
+[profile staging]
+sso_start_url = https://gremlin.awsapps.com/start
+sso_region = eu-west-1
+sso_account_id = 123456789012
+sso_role_name = DeveloperAccess
+region = eu-west-1
+
+[profile production]
+sso_start_url = https://gremlin.awsapps.com/start
+sso_region = eu-west-1
+sso_account_id = 987654321098
+sso_role_name = ReadOnlyAccess
+region = eu-west-1
+```
+
+Switch profiles:
+
+```bash
+export AWS_PROFILE=staging
+aws sso login
+```
+
+## Terraform
+
+We use [tfenv](https://github.com/tfutils/tfenv) to manage Terraform versions per project:
+
+```bash
+brew install tfenv
+```
+
+Install the latest version:
+
+```bash
+tfenv install latest
+tfenv use latest
+```
+
+Projects with a `.terraform-version` file will auto-select the right version.
+
+Verify:
+
+```bash
+terraform version
+```
+
+### Terraform Basics
+
+```bash
+# Initialise a project (downloads providers)
+terraform init
+
+# Preview changes
+terraform plan
+
+# Apply changes
+terraform apply
+
+# Show current state
+terraform show
+```
+
+Never run `terraform apply` in production without a reviewed plan. Use CI/CD for production changes.
+
+## Pulumi
+
+Some of our infrastructure uses [Pulumi](https://www.pulumi.com/) with Python. Install it:
+
+```bash
+brew install pulumi
+
+# Set up Python with uv
+brew install uv
+```
+
+For Pulumi projects:
+
+```bash
+cd infra/
+uv sync          # install Python dependencies
+pulumi preview   # preview changes
+pulumi up        # apply changes
+```
+
+## Docker
+
+Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) or use [OrbStack](https://orbstack.dev/) (faster, lighter alternative for macOS):
+
+```bash
+brew install --cask orbstack
+```
+
+Verify:
+
+```bash
+docker version
+docker compose version
+```
+
+## Infrastructure Repos
+
+Key repos to clone:
+
+```bash
+cd ~/git/gremlin
+git clone git@github.com:GremlinLTD/iac.git
+```
+
+The `iac` repo contains our infrastructure code. Read its README for project-specific setup instructions.
+
+## Next Steps
+
+Continue to [Development Workflow](/onboarding/development-workflow/) to learn how we work day-to-day.

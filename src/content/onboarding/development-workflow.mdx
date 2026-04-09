@@ -1,0 +1,99 @@
+---
+title: "Development Workflow"
+description: "How we work day-to-day: branching, PRs, code review, and deployment"
+step: 6
+---
+
+This is how we ship code. Consistent workflows mean fewer surprises.
+
+## Daily Workflow
+
+1. **Pick up a task** from the project board
+2. **Create a branch** from `develop`:
+   ```bash
+   git checkout develop
+   git pull
+   git checkout -b feature/your-feature-name
+   ```
+3. **Write code** with tests
+4. **Commit often** using [conventional commits](/guides/conventional-commits/)
+5. **Push and open a PR** against `develop`
+6. **Get a review** from at least one team member
+7. **Merge** once approved
+
+## Pull Requests
+
+Keep PRs focused and small. A good PR:
+
+- Does one thing
+- Has a clear title and description
+- Includes tests for new behaviour
+- Passes CI checks
+
+### PR Template
+
+```markdown
+## What
+
+Brief description of what changed.
+
+## Why
+
+Why was this change needed?
+
+## How to Test
+
+Steps to verify the change works.
+```
+
+## Code Review
+
+When reviewing:
+
+- **Be kind, be specific.** "This could be clearer" is better than "this is wrong."
+- **Ask questions** rather than making demands. "What happens if X is null?" prompts thinking.
+- **Approve when it's good enough.** Perfect is the enemy of shipped.
+- **Test it locally** if the change is non-trivial.
+
+When receiving feedback:
+
+- **Don't take it personally.** Reviews are about the code, not you.
+- **Ask for clarification** if feedback is unclear.
+- **Push back respectfully** if you disagree, with reasoning.
+
+## CI/CD
+
+Most repos have GitHub Actions that run on PR:
+
+- **Lint** - code style checks
+- **Test** - unit and integration tests
+- **Build** - verify the project compiles/builds
+- **Security** - dependency vulnerability scanning
+
+All checks must pass before merging.
+
+## Environments
+
+| Environment | Branch | Deploy |
+|------------|--------|--------|
+| Development | `develop` | Auto on merge |
+| Staging | `release/*` | Auto on branch creation |
+| Production | `main` | Manual approval |
+
+## Hotfixes
+
+For urgent production fixes:
+
+```bash
+git checkout main
+git pull
+git checkout -b hotfix/fix-description
+# fix, test, commit
+# PR against main AND develop
+```
+
+## Communication
+
+- **Stuck for more than 30 minutes?** Ask for help. Drop a message in the team chat.
+- **Starting a large piece of work?** Share your approach before coding. A 5-minute chat can save days.
+- **Finished a PR?** Let the team know it's ready for review.

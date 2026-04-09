@@ -63,4 +63,216 @@ tools:
     description: Alternative to pre-commit for managing git hooks
     url: https://github.com/vitobotta/prek
     install: "brew install prek"
+    category: Git & Workflow
+
+  # Languages & Runtimes
+
+  - name: rustup
+    description: Rust toolchain installer and version manager
+    url: https://rustup.rs
+    install: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    category: Languages & Runtimes
+
+  - name: go
+    description: The Go programming language
+    url: https://go.dev
+    install: "brew install go"
+    category: Languages & Runtimes
+
+  - name: deno
+    description: Secure runtime for JavaScript and TypeScript
+    url: https://deno.com
+    install: "brew install deno"
+    category: Languages & Runtimes
+
+  # Cloud CLIs
+
+  - name: awscli
+    description: Official AWS command-line interface
+    url: https://aws.amazon.com/cli/
+    install: "brew install awscli"
+    category: Cloud CLIs
+
+  - name: azure-cli
+    description: Microsoft Azure command-line interface
+    url: https://learn.microsoft.com/en-us/cli/azure/
+    install: "brew install azure-cli"
+    category: Cloud CLIs
+
+  - name: granted
+    description: Switch between cloud roles and accounts with a single command
+    url: https://docs.commonfate.io/granted/introduction
+    install: "brew install granted"
+    category: Cloud CLIs
+
+  # Infrastructure
+
+  - name: pulumi
+    description: Infrastructure as code using real programming languages
+    url: https://www.pulumi.com
+    install: "brew install pulumi"
+    category: Infrastructure
+
+  - name: terragrunt
+    description: Thin wrapper for Terraform that provides extra tools for DRY configs
+    url: https://terragrunt.gruntwork.io
+    install: "brew install terragrunt"
+    category: Infrastructure
+
+  - name: tflint
+    description: Terraform linter for detecting errors and enforcing conventions
+    url: https://github.com/terraform-linters/tflint
+    install: "brew install tflint"
+    category: Infrastructure
+
+  - name: tfsec
+    description: Security scanner for Terraform code
+    url: https://github.com/aquasecurity/tfsec
+    install: "brew install tfsec"
+    category: Infrastructure
+
+  - name: terraform-docs
+    description: Generate documentation from Terraform modules
+    url: https://terraform-docs.io
+    install: "brew install terraform-docs"
+    category: Infrastructure
+
+  # Kubernetes (additional)
+
+  - name: helm
+    description: Package manager for Kubernetes
+    url: https://helm.sh
+    install: "brew install helm"
     category: Kubernetes
+
+  - name: k9s
+    description: Terminal UI for managing Kubernetes clusters
+    url: https://k9scli.io
+    install: "brew install k9s"
+    category: Kubernetes
+
+  - name: kustomize
+    description: Template-free customisation of Kubernetes YAML
+    url: https://kustomize.io
+    install: "brew install kustomize"
+    category: Kubernetes
+
+  - name: dive
+    description: Explore Docker image layers and find ways to shrink images
+    url: https://github.com/wagoodman/dive
+    install: "brew install dive"
+    category: Containers
+
+  - name: crane
+    description: Tool for interacting with remote container registries
+    url: https://github.com/google/go-containerregistry
+    install: "brew install crane"
+    category: Containers
+
+  - name: skopeo
+    description: Inspect and copy container images without a daemon
+    url: https://github.com/containers/skopeo
+    install: "brew install skopeo"
+    category: Containers
+
+  # Code Quality
+
+  - name: ruff
+    description: Extremely fast Python linter and formatter
+    url: https://docs.astral.sh/ruff/
+    install: "brew install ruff"
+    category: Code Quality
+
+  - name: biome
+    description: Fast formatter and linter for JavaScript, TypeScript, and JSON
+    url: https://biomejs.dev
+    install: "brew install biome"
+    category: Code Quality
+
+  - name: shellcheck
+    description: Static analysis tool for shell scripts
+    url: https://www.shellcheck.net
+    install: "brew install shellcheck"
+    category: Code Quality
+
+  - name: yamllint
+    description: Linter for YAML files
+    url: https://github.com/adrienverge/yamllint
+    install: "brew install yamllint"
+    category: Code Quality
+
+  - name: actionlint
+    description: Static checker for GitHub Actions workflow files
+    url: https://github.com/rhysd/actionlint
+    install: "brew install actionlint"
+    category: Code Quality
+
+  # Security
+
+  - name: trufflehog
+    description: Find leaked credentials in git repos, filesystems, and S3 buckets
+    url: https://github.com/trufflesecurity/trufflehog
+    install: "brew install trufflehog"
+    category: Security
+
+  - name: detect-secrets
+    description: Detect secrets in code to prevent accidental commits
+    url: https://github.com/Yelp/detect-secrets
+    install: "brew install detect-secrets"
+    category: Security
+
+  - name: snyk-cli
+    description: Find and fix vulnerabilities in dependencies and container images
+    url: https://snyk.io
+    install: "brew install snyk-cli"
+    category: Security
+
+  - name: age
+    description: Simple, modern file encryption tool
+    url: https://github.com/FiloSottile/age
+    install: "brew install age"
+    category: Security
+
+  # General Utilities
+
+  - name: ripgrep
+    description: Blazingly fast recursive search tool (better grep)
+    url: https://github.com/BurntSushi/ripgrep
+    install: "brew install ripgrep"
+    category: General Utilities
+
+  - name: fzf
+    description: General-purpose fuzzy finder for the terminal
+    url: https://github.com/junegunn/fzf
+    install: "brew install fzf"
+    category: General Utilities
+
+  - name: difftastic
+    description: Structural diff tool that understands syntax
+    url: https://difftastic.wilfred.me.uk
+    install: "brew install difftastic"
+    category: General Utilities
+
+  - name: just
+    description: Command runner like make but simpler and more portable
+    url: https://just.systems
+    install: "brew install just"
+    category: General Utilities
+
+  - name: gh
+    description: GitHub CLI for managing repos, PRs, and issues from the terminal
+    url: https://cli.github.com
+    install: "brew install gh"
+    category: Git & Workflow
+
+  - name: git-crypt
+    description: Transparent file encryption in git using GPG
+    url: https://github.com/AGWA/git-crypt
+    install: "brew install git-crypt"
+    category: Git & Workflow
+
+  - name: cocogitto
+    description: Conventional commits tooling with changelog generation
+    url: https://docs.cocogitto.io
+    install: "brew install cocogitto"
+    category: Git & Workflow

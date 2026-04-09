@@ -1,0 +1,131 @@
+---
+title: "Kubernetes Tooling"
+description: "Install and configure kubectl, krew, stern, and cluster access"
+step: 4
+---
+
+Most of our infrastructure runs on Kubernetes. Here's how to get your local tooling sorted.
+
+## kubectl
+
+The Kubernetes CLI. Install it via Homebrew:
+
+```bash
+brew install kubectl
+```
+
+Verify it works:
+
+```bash
+kubectl version --client
+```
+
+## Kubeconfig
+
+Your kubeconfig file (`~/.kube/config`) tells kubectl how to connect to clusters. You'll receive cluster credentials from a team lead.
+
+Once you have them, verify access:
+
+```bash
+kubectl cluster-info
+kubectl get nodes
+```
+
+### Multiple Clusters
+
+If you work across multiple clusters, keep configs separate and merge them:
+
+```bash
+export KUBECONFIG=~/.kube/config:~/.kube/staging:~/.kube/production
+```
+
+Switch between contexts:
+
+```bash
+kubectl config use-context staging
+kubectl config use-context production
+```
+
+## krew - Plugin Manager
+
+[krew](https://krew.sigs.k8s.io) lets you install kubectl plugins. Install it:
+
+```bash
+brew install krew
+```
+
+Add to your shell config:
+
+```bash
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+```
+
+Useful plugins:
+
+```bash
+kubectl krew install ctx       # fast context switching
+kubectl krew install ns        # fast namespace switching
+kubectl krew install neat      # clean up YAML output
+kubectl krew install tree      # show object hierarchy
+kubectl krew install whoami    # show current user/permissions
+```
+
+## stern - Log Tailing
+
+[stern](https://github.com/stern/stern) tails logs across multiple pods. Essential for debugging:
+
+```bash
+brew install stern
+```
+
+Usage:
+
+```bash
+# Tail all pods matching "api" in current namespace
+stern api
+
+# Tail specific container across pods
+stern api -c nginx
+
+# Tail with timestamps
+stern api -t
+
+# Tail across all namespaces
+stern api --all-namespaces
+
+# Tail only the last 10 lines
+stern api --tail 10
+```
+
+## k9s - Terminal UI
+
+[k9s](https://k9scli.io) gives you a terminal dashboard for Kubernetes:
+
+```bash
+brew install k9s
+```
+
+Launch it:
+
+```bash
+k9s                    # current context
+k9s --context staging  # specific context
+k9s -n kube-system     # specific namespace
+```
+
+Key shortcuts in k9s:
+- `:pods` - view pods
+- `:svc` - view services
+- `:deploy` - view deployments
+- `l` - view logs
+- `s` - shell into container
+- `d` - describe resource
+- `ctrl+d` - delete resource
+
+## Lens (Optional)
+
+If you prefer a GUI, [Lens](https://k8slens.dev) is a desktop app for managing clusters. It's not required but some people find it useful for visualising resources.
+
+## Next Steps
+
+Continue to [Cloud & Infrastructure](/onboarding/cloud-and-infrastructure/) to set up your AWS access and infrastructure tools.

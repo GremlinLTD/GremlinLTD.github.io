@@ -1,0 +1,132 @@
+---
+title: "Shell & Dotfiles"
+description: "Configure your terminal, shell prompt, and common aliases"
+step: 2
+---
+
+A well-configured shell saves you hours every week. Here's how we set ours up.
+
+## Shell Choice
+
+We recommend **zsh** (default on macOS) or **fish**. Both work well with our tooling.
+
+## Starship Prompt
+
+We use [Starship](https://starship.rs) for a fast, informative prompt that shows git status, language versions, and Kubernetes context at a glance.
+
+Install and initialise:
+
+```bash
+brew install starship
+```
+
+Add to your shell config:
+
+```bash
+# ~/.zshrc
+eval "$(starship init zsh)"
+
+# ~/.config/fish/config.fish
+starship init fish | source
+```
+
+Create a minimal config at `~/.config/starship.toml`:
+
+```toml
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"
+
+[kubernetes]
+disabled = false
+format = '[$symbol$context( \($namespace\))]($style) '
+
+[gcloud]
+disabled = true
+
+[aws]
+disabled = false
+format = '[$symbol($profile )(\($region\))]($style) '
+```
+
+## Useful Aliases
+
+Add these to your `~/.zshrc` or `~/.config/fish/config.fish`:
+
+```bash
+# Git shortcuts
+alias gs="git status"
+alias gd="git diff"
+alias gl="git log --oneline -20"
+alias gco="git checkout"
+alias gcb="git checkout -b"
+
+# Kubernetes
+alias k="kubectl"
+alias kgp="kubectl get pods"
+alias kgs="kubectl get svc"
+alias kns="kubectl config set-context --current --namespace"
+alias kctx="kubectl config use-context"
+
+# Docker
+alias dc="docker compose"
+alias dps="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+
+# General
+alias ll="ls -la"
+alias ..="cd .."
+alias ...="cd ../.."
+```
+
+## Directory Navigation
+
+[zoxide](https://github.com/ajeetdsouza/zoxide) is a smarter `cd` that learns your habits:
+
+```bash
+brew install zoxide
+```
+
+Add to your shell config:
+
+```bash
+eval "$(zoxide init zsh)"
+```
+
+Then use `z` instead of `cd`:
+
+```bash
+z gremlin    # jumps to ~/git/gremlin (or wherever you go most)
+z site       # jumps to the last directory matching "site"
+```
+
+## Terminal Multiplexer
+
+For managing multiple sessions, we recommend [tmux](https://github.com/tmux/tmux):
+
+```bash
+brew install tmux
+```
+
+A minimal `~/.tmux.conf`:
+
+```bash
+# Use Ctrl+a instead of Ctrl+b
+set -g prefix C-a
+unbind C-b
+bind C-a send-prefix
+
+# Split panes with | and -
+bind | split-window -h
+bind - split-window -v
+
+# Mouse support
+set -g mouse on
+
+# Start windows and panes at 1, not 0
+set -g base-index 1
+setw -g pane-base-index 1
+```
+
+## Next Steps
+
+Continue to [Git Configuration](/onboarding/git-configuration/) to set up your commit signing and defaults.

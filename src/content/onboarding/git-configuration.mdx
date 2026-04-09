@@ -1,0 +1,117 @@
+---
+title: "Git Configuration"
+description: "Set up git defaults, commit signing, and branch conventions"
+step: 3
+---
+
+Consistent git configuration across the team keeps our repos clean and our history useful.
+
+## Basic Config
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.name@gremlin.group"
+
+# Default branch name
+git config --global init.defaultBranch main
+
+# Better diffs
+git config --global diff.algorithm histogram
+
+# Auto-prune stale remote branches on fetch
+git config --global fetch.prune true
+
+# Rebase by default on pull (avoids merge commits)
+git config --global pull.rebase true
+```
+
+## Commit Signing
+
+We sign commits with SSH keys. This verifies you are who you say you are.
+
+### Set up SSH signing
+
+```bash
+# Use your existing SSH key for signing
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+```
+
+### Add your signing key to GitHub
+
+1. Go to [GitHub SSH Keys](https://github.com/settings/keys)
+2. Click "New SSH key"
+3. Set type to **Signing Key**
+4. Paste your public key (`cat ~/.ssh/id_ed25519.pub`)
+
+Your commits will now show as "Verified" on GitHub.
+
+## Branch Conventions
+
+We follow Gitflow branching. Branch names must follow this pattern:
+
+| Prefix | Purpose | Example |
+|--------|---------|---------|
+| `feature/` | New functionality | `feature/project-search` |
+| `bugfix/` | Non-urgent fixes | `bugfix/nav-overflow` |
+| `hotfix/` | Urgent production fixes | `hotfix/auth-timeout` |
+| `release/` | Release preparation | `release/2.1.0` |
+
+Never commit directly to `main` or `develop`.
+
+## Commit Messages
+
+We use [Conventional Commits](/guides/conventional-commits/). Every commit message follows:
+
+```
+<type>(<scope>): <description>
+```
+
+Install [prek](https://github.com/vitobotta/prek) to enforce this with git hooks:
+
+```bash
+brew install prek
+```
+
+## Useful Git Config
+
+```bash
+# Show branch in prompt (if not using Starship)
+git config --global branch.sort -committerdate
+
+# Better log format
+git config --global alias.lg "log --graph --oneline --decorate -20"
+
+# Shortcut for amending
+git config --global alias.amend "commit --amend --no-edit"
+
+# See what changed in last commit
+git config --global alias.last "log -1 --stat"
+```
+
+## .gitignore Global
+
+Create a global gitignore for OS and editor files:
+
+```bash
+git config --global core.excludesfile ~/.gitignore_global
+```
+
+Add to `~/.gitignore_global`:
+
+```
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+```
+
+## Next Steps
+
+Continue to [Kubernetes Tooling](/onboarding/kubernetes-tooling/) to set up your cluster access.
