@@ -11,7 +11,7 @@ const links = [
 ---
 <nav class="nav">
   <div class="nav-inner container">
-    <a href="/" class="nav-logo">Gremlin LTD</a>
+    <a href="/" class="nav-logo">gremlin<span class="nav-logo-dot">.</span></a>
     <button class="nav-hamburger" aria-label="Toggle menu" type="button">
       <span></span><span></span><span></span>
     </button>
@@ -43,9 +43,16 @@ const links = [
   }
   .nav-logo {
     font-weight: 700;
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     color: var(--color-text);
     text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav-logo:hover {
+    text-decoration: none;
+  }
+  .nav-logo-dot {
+    color: var(--electric-teal);
   }
   .nav-links {
     display: flex;

@@ -60,7 +60,7 @@ tools:
     category: Kubernetes
 
   - name: prek
-    description: Preview Kubernetes manifests before applying
+    description: Alternative to pre-commit for managing git hooks
     url: https://github.com/vitobotta/prek
     install: "brew install prek"
     category: Kubernetes
