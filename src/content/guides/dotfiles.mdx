@@ -193,8 +193,8 @@ Needs a [Nerd Font](https://www.nerdfonts.com/) installed (JetBrainsMono or Fira
 ```toml
 # --- Prompt character ---
 [character]
-success_symbol = ""                    # clean prompt on success
-error_symbol = "[](bold red)"         # red cross on error
+success_symbol = "[](bold green)"         # tick on success (U+EAB2)
+error_symbol = "[](bold red)"          # cross on error (U+EA76)
 
 # --- User / host ---
 [username]
@@ -244,7 +244,7 @@ style = 'dimmed yellow'
 
 # --- Exit status ---
 [status]
-symbol = "[](bold red)"
+symbol = "[](bold red)"
 success_symbol = ""
 format = '[$symbol$common_meaning$signal_name$maybe_int]($style) '
 map_symbol = true
