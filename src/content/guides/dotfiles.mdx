@@ -231,6 +231,17 @@ diverged = '⇕⇡${ahead_count}⇣${behind_count}'
 behind = '⇣${count}'
 up_to_date = '✓'
 
+[git_commit]
+only_detached = true                    # show commit hash when HEAD is detached
+tag_symbol = '  '                     # nerd font tag icon (U+F412)
+
+# --- Command duration ---
+# Shows how long the last command took. Useful for builds, terraform, etc.
+[cmd_duration]
+min_time = 2_000                        # only show if command took >2s
+format = '[$duration]($style) '
+style = 'dimmed yellow'
+
 # --- Exit status ---
 [status]
 symbol = "[](bold red)"
@@ -238,6 +249,16 @@ success_symbol = ""
 format = '[$symbol$common_meaning$signal_name$maybe_int]($style) '
 map_symbol = true
 disabled = false
+
+# --- Docker ---
+[docker_context]
+symbol = ' '                          # nerd font Docker icon (U+F308)
+format = '[$symbol$context]($style) '
+only_with_files = true                  # only show when Dockerfile or compose.yaml present
+
+# --- Package version ---
+[package]
+disabled = false                        # shows version from package.json, Cargo.toml, etc.
 
 # --- Cloud & infra ---
 [kubernetes]
@@ -258,7 +279,17 @@ format = '[$symbol$version - $workspace]($style) '
 [helm]
 symbol = ' '                          # nerd font Helm icon (U+E7FB)
 
-# --- Languages ---
+
+[pulumi]
+disabled = false                        # show Pulumi stack info in IaC projects
+
+# --- Languages & runtimes ---
+[bun]
+format = '[$symbol($version)]($style) '
+
+[deno]
+format = '[$symbol($version)]($style) '
+
 [rust]
 symbol = '󱘗 '                          # nerd font Rust icon (U+F1617)
 
