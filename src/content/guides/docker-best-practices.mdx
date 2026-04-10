@@ -5,7 +5,7 @@ date: 2026-04-10
 tags: ["docker", "containers", "security"]
 ---
 
-We build and ship containers for clients regularly. Here's how we keep them small, fast, and secure.
+We ship a lot of containers. These are the patterns we've settled on after doing it wrong a few times.
 
 ## Multi-Stage Builds
 
@@ -113,7 +113,7 @@ The dummy `main.rs` trick caches dependency compilation.
 
 ## Image Size
 
-Smaller images mean faster pulls, less storage, and smaller attack surface.
+Smaller images pull faster and give attackers less to work with.
 
 ### Use Alpine or Distroless Base Images
 
