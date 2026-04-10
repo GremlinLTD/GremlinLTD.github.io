@@ -22,7 +22,6 @@ Install these regardless of what languages you work with:
 
 ```bash
 # Core
-code --install-extension EditorConfig.EditorConfig
 code --install-extension eamodio.gitlens
 code --install-extension github.copilot
 code --install-extension github.copilot-chat
@@ -119,34 +118,6 @@ brew install --cask font-fira-code-nerd-font
 ```
 
 Set your terminal and editor font to "JetBrainsMono Nerd Font" or "FiraCode Nerd Font".
-
-## EditorConfig
-
-Most of our repos include an `.editorconfig` file. This ensures consistent formatting regardless of editor. A typical config:
-
-```ini
-root = true
-
-[*]
-end_of_line = lf
-insert_final_newline = true
-trim_trailing_whitespace = true
-charset = utf-8
-
-[*.{ts,tsx,js,jsx,json,yaml,yml,astro}]
-indent_style = space
-indent_size = 2
-
-[*.{py}]
-indent_style = space
-indent_size = 4
-
-[*.{go}]
-indent_style = tab
-
-[Makefile]
-indent_style = tab
-```
 
 ## Next Steps
 
