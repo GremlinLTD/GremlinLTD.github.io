@@ -60,7 +60,10 @@ export async function fetchPublicRepos(): Promise<GitHubRepo[]> {
 
   const repos: GitHubRepo[] = await response.json();
 
-  const filtered = repos.filter(r => !config.projects.hidden.includes(r.name));
+  const filtered = repos.filter(r =>
+    !config.projects.hidden.includes(r.name) &&
+    !r.name.startsWith('template-')
+  );
 
   const pinned: GitHubRepo[] = [];
   const unpinned: GitHubRepo[] = [];

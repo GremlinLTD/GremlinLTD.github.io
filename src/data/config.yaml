@@ -4,8 +4,7 @@ projects:
     - aws-ssh-config
   hidden:
     - GremlinLTD.github.io
-    - template-rust
-    - template-base
+    # template-* repos are filtered automatically in code
 
 tools:
   - name: homebrew
