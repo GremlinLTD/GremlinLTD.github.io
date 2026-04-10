@@ -2,7 +2,10 @@ projects:
   pinned:
     - space-investigator
     - aws-ssh-config
-  hidden: []
+  hidden:
+    - GremlinLTD.github.io
+    - template-rust
+    - template-base
 
 tools:
   - name: homebrew
