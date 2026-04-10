@@ -1,0 +1,120 @@
+---
+title: "PR Review Checklist"
+description: "What to look for when reviewing code. A structured approach to giving useful feedback."
+date: 2026-04-10
+tags: ["code-review", "workflow", "quality"]
+---
+
+A checklist for reviewing pull requests. Not every item applies to every PR, use your judgement.
+
+## Before You Start
+
+- [ ] **Read the PR description.** Understand what it's trying to do and why.
+- [ ] **Check the ticket/issue.** Make sure the PR actually addresses what was asked for.
+- [ ] **Look at the file list first.** Get a sense of scope before diving into individual files.
+
+## Correctness
+
+- [ ] **Does it do what it claims?** Walk through the logic. Does it handle the happy path correctly?
+- [ ] **Edge cases.** What happens with empty input, null values, zero, negative numbers, very large data?
+- [ ] **Error handling.** Are errors caught, logged, and surfaced appropriately? Are they swallowed silently?
+- [ ] **Off-by-one errors.** Loops, array indexing, pagination, date ranges.
+- [ ] **Race conditions.** Concurrent access, shared state, async operations completing out of order.
+- [ ] **Data validation.** Is user input validated? Are types checked at system boundaries?
+
+## Security
+
+- [ ] **No secrets in code.** API keys, tokens, passwords, connection strings.
+- [ ] **Input sanitisation.** SQL injection, XSS, command injection, path traversal.
+- [ ] **Authentication/authorisation.** Are endpoints properly protected? Can users access things they shouldn't?
+- [ ] **Logging.** Are sensitive values excluded from logs? (passwords, tokens, PII)
+- [ ] **Dependencies.** Are new dependencies well-maintained? Do they have known vulnerabilities?
+
+## Design
+
+- [ ] **Right level of abstraction.** Not too clever, not too verbose. Would a new team member understand this?
+- [ ] **Single responsibility.** Does each function/class do one thing well?
+- [ ] **Existing patterns.** Does it follow the patterns already in the codebase, or introduce new ones without good reason?
+- [ ] **Naming.** Do names describe what things are or do? Would you understand them without reading the implementation?
+- [ ] **API design.** If this adds/changes an API: is it intuitive? backwards compatible? documented?
+
+## Testing
+
+- [ ] **Tests exist.** New behaviour should have tests. Bug fixes should have regression tests.
+- [ ] **Tests are meaningful.** Do they test behaviour, not implementation details? Would they catch a real bug?
+- [ ] **Tests pass.** CI is green. If tests are skipped, there's a good reason.
+- [ ] **Edge cases tested.** Empty lists, null values, error paths, boundary conditions.
+- [ ] **No flaky tests.** Tests shouldn't depend on timing, network, or external state.
+
+## Infrastructure (Terraform/Pulumi)
+
+- [ ] **Plan reviewed.** `terraform plan` output makes sense and matches intent.
+- [ ] **No hardcoded values.** Use variables for anything environment-specific.
+- [ ] **Tags present.** Resources are tagged (Environment, Project, ManagedBy, Owner).
+- [ ] **State management.** State key follows conventions. No sensitive data in outputs.
+- [ ] **Security scanning.** tfsec/tflint pass, or findings are acknowledged.
+
+## Kubernetes
+
+- [ ] **Resource limits set.** CPU and memory requests/limits defined.
+- [ ] **Health checks.** Liveness and readiness probes configured.
+- [ ] **Security context.** Running as non-root, read-only root filesystem where possible.
+- [ ] **Secrets.** Not stored in manifests. Using Kubernetes Secrets or external secret managers.
+
+## Docker
+
+- [ ] **Multi-stage build.** Final image doesn't contain build tools or source.
+- [ ] **Non-root user.** Container runs as non-root.
+- [ ] **Base image pinned.** Not using `:latest`.
+- [ ] **No secrets in image.** Build args and environment aren't leaking credentials.
+- [ ] **.dockerignore exists.** Unnecessary files excluded from build context.
+
+## Documentation
+
+- [ ] **README updated.** If the change affects setup, running, or usage, the README reflects it.
+- [ ] **Breaking changes noted.** If this changes an API or interface, is it called out?
+- [ ] **Comments where needed.** Complex logic has a brief explanation of *why*, not *what*.
+
+## Giving Feedback
+
+### Be Specific
+
+```
+# Bad
+"This could be better"
+
+# Good
+"This query runs inside a loop, which will hit the database
+N times. Consider batching with a WHERE IN clause."
+```
+
+### Be Kind
+
+```
+# Bad
+"Why would you do it this way?"
+
+# Good
+"Have you considered using X here? It handles the
+edge case where Y is null, which I think this might miss."
+```
+
+### Distinguish Severity
+
+Use prefixes to signal what's blocking and what's a suggestion:
+
+- **Blocker:** "This will crash in production when X is null."
+- **Important:** "This N+1 query will be slow with large datasets."
+- **Nit:** "Minor style preference, take it or leave it."
+- **Question:** "I'm not sure I understand this, can you explain?"
+
+### Know When to Approve
+
+The code doesn't need to be how you'd write it. It needs to be:
+
+- Correct
+- Secure
+- Maintainable
+- Tested
+
+If it meets those criteria, approve it. Perfect is the enemy of shipped.

@@ -1,0 +1,295 @@
+---
+title: "Kubernetes Cheatsheet"
+description: "Common kubectl commands, debugging workflows, and quick-reference patterns."
+date: 2026-04-10
+tags: ["kubernetes", "kubectl", "devops"]
+---
+
+Quick reference for the commands and patterns you'll use most often.
+
+## Context & Namespace
+
+```bash
+# List all contexts
+kubectl config get-contexts
+
+# Switch context
+kubectl config use-context staging
+# or with krew ctx plugin
+kubectl ctx staging
+
+# Set default namespace
+kubectl config set-context --current --namespace=my-app
+# or with krew ns plugin
+kubectl ns my-app
+
+# See current context and namespace
+kubectl config current-context
+```
+
+## Getting Resources
+
+```bash
+# Pods
+kubectl get pods                     # current namespace
+kubectl get pods -A                  # all namespaces
+kubectl get pods -o wide             # more detail (node, IP)
+kubectl get pods -w                  # watch for changes
+kubectl get pods -l app=api          # filter by label
+
+# Common resources
+kubectl get svc                      # services
+kubectl get deploy                   # deployments
+kubectl get ing                      # ingresses
+kubectl get cm                       # configmaps
+kubectl get secret                   # secrets
+kubectl get pvc                      # persistent volume claims
+kubectl get nodes                    # cluster nodes
+kubectl get events --sort-by='.lastTimestamp'  # recent events
+
+# All resources in a namespace
+kubectl get all
+
+# Custom output
+kubectl get pods -o json             # full JSON
+kubectl get pods -o yaml             # full YAML
+kubectl get pods -o name             # just names
+kubectl get pods -o jsonpath='{.items[*].metadata.name}'  # jsonpath
+```
+
+## Describing & Inspecting
+
+```bash
+# Describe a resource (shows events, conditions, config)
+kubectl describe pod my-pod
+kubectl describe node my-node
+kubectl describe svc my-service
+
+# Get YAML definition
+kubectl get pod my-pod -o yaml
+
+# Clean YAML output (with krew neat plugin)
+kubectl get pod my-pod -o yaml | kubectl neat
+
+# Show resource tree (with krew tree plugin)
+kubectl tree deployment my-app
+```
+
+## Logs
+
+```bash
+# Pod logs
+kubectl logs my-pod
+kubectl logs my-pod -c my-container  # specific container
+kubectl logs my-pod --previous       # previous crashed container
+kubectl logs my-pod -f               # follow/stream
+kubectl logs my-pod --tail=50        # last 50 lines
+kubectl logs my-pod --since=1h       # last hour
+
+# stern (multi-pod tailing)
+stern api                            # all pods matching "api"
+stern api -c nginx                   # specific container
+stern api -t                         # with timestamps
+stern api --tail 10                  # last 10 lines
+stern api -A                         # all namespaces
+stern api -s 5m                      # last 5 minutes
+stern api -o json                    # JSON output
+stern api -e 'health'               # exclude lines matching pattern
+```
+
+## Exec & Debug
+
+```bash
+# Shell into a running container
+kubectl exec -it my-pod -- /bin/sh
+kubectl exec -it my-pod -c my-container -- /bin/bash
+
+# Run a one-off command
+kubectl exec my-pod -- cat /etc/config/app.yaml
+
+# Debug pod (creates ephemeral debug container)
+kubectl debug -it my-pod --image=busybox
+
+# Run a debug pod in the cluster
+kubectl run debug --rm -it --image=busybox -- /bin/sh
+kubectl run debug --rm -it --image=nicolaka/netshoot -- /bin/bash
+
+# Port forward
+kubectl port-forward pod/my-pod 8080:80
+kubectl port-forward svc/my-service 8080:80
+kubectl port-forward deploy/my-app 8080:80
+```
+
+## Creating & Applying
+
+```bash
+# Apply a manifest
+kubectl apply -f manifest.yaml
+kubectl apply -f manifests/          # whole directory
+kubectl apply -k overlays/staging/   # kustomize
+
+# Create from command line
+kubectl create namespace my-app
+kubectl create configmap my-config --from-file=config.yaml
+kubectl create secret generic my-secret --from-literal=key=value
+
+# Dry run (see what would be applied)
+kubectl apply -f manifest.yaml --dry-run=client -o yaml
+kubectl apply -f manifest.yaml --dry-run=server -o yaml  # server-side validation
+```
+
+## Scaling & Updating
+
+```bash
+# Scale deployment
+kubectl scale deploy my-app --replicas=3
+
+# Restart pods (rolling restart)
+kubectl rollout restart deploy my-app
+
+# Rollout status
+kubectl rollout status deploy my-app
+
+# Rollback
+kubectl rollout undo deploy my-app
+kubectl rollout undo deploy my-app --to-revision=3
+
+# Rollout history
+kubectl rollout history deploy my-app
+```
+
+## Deleting
+
+```bash
+# Delete a resource
+kubectl delete pod my-pod
+kubectl delete -f manifest.yaml
+
+# Force delete a stuck pod
+kubectl delete pod my-pod --grace-period=0 --force
+
+# Delete all pods in a namespace
+kubectl delete pods --all
+
+# Delete a namespace (and everything in it)
+kubectl delete namespace my-app
+```
+
+## Debugging Workflows
+
+### Pod Won't Start
+
+```bash
+# 1. Check pod status
+kubectl get pod my-pod
+
+# 2. Check events
+kubectl describe pod my-pod
+
+# 3. Common statuses:
+#    Pending     - no node can schedule it (resource limits, node selectors)
+#    ImagePullBackOff - can't pull the image (wrong name, no auth)
+#    CrashLoopBackOff - starts then crashes (check logs)
+#    Init:Error  - init container failed
+```
+
+### CrashLoopBackOff
+
+```bash
+# 1. Check logs from the crashed container
+kubectl logs my-pod --previous
+
+# 2. Check if it's an OOM kill
+kubectl describe pod my-pod | grep -A5 "Last State"
+
+# 3. Debug with an ephemeral container
+kubectl debug -it my-pod --image=busybox
+```
+
+### Service Not Reachable
+
+```bash
+# 1. Check the service exists and has endpoints
+kubectl get svc my-service
+kubectl get endpoints my-service
+
+# 2. If no endpoints, check label selector matches pods
+kubectl get svc my-service -o yaml | grep -A5 selector
+kubectl get pods -l app=my-app
+
+# 3. Test from inside the cluster
+kubectl run debug --rm -it --image=busybox -- wget -qO- http://my-service:8080/health
+
+# 4. Check network policies
+kubectl get networkpolicy
+```
+
+### DNS Issues
+
+```bash
+# Test DNS resolution from inside the cluster
+kubectl run debug --rm -it --image=busybox -- nslookup my-service
+kubectl run debug --rm -it --image=busybox -- nslookup my-service.my-namespace.svc.cluster.local
+```
+
+### Node Issues
+
+```bash
+# Check node status and conditions
+kubectl get nodes
+kubectl describe node my-node
+
+# Check resource usage
+kubectl top nodes
+kubectl top pods
+
+# Check which pods are on a node
+kubectl get pods --field-selector spec.nodeName=my-node -A
+```
+
+## k9s Quick Reference
+
+```bash
+k9s                        # launch
+k9s --context staging      # specific context
+k9s -n kube-system         # specific namespace
+```
+
+| Key | Action |
+|-----|--------|
+| `:pods` | View pods |
+| `:svc` | View services |
+| `:deploy` | View deployments |
+| `:ns` | View namespaces |
+| `l` | View logs |
+| `s` | Shell into container |
+| `d` | Describe resource |
+| `e` | Edit resource |
+| `ctrl+d` | Delete resource |
+| `/` | Filter/search |
+| `?` | Help |
+
+## Useful One-Liners
+
+```bash
+# Get all images running in a namespace
+kubectl get pods -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | sort -u
+
+# Get pods sorted by restart count
+kubectl get pods --sort-by='.status.containerStatuses[0].restartCount'
+
+# Get pods sorted by CPU usage
+kubectl top pods --sort-by=cpu
+
+# Get all pods not in Running state
+kubectl get pods --field-selector=status.phase!=Running
+
+# Copy file from pod
+kubectl cp my-pod:/path/to/file ./local-file
+
+# Copy file to pod
+kubectl cp ./local-file my-pod:/path/to/file
+
+# Watch events in real time
+kubectl get events -w --sort-by='.lastTimestamp'
+```

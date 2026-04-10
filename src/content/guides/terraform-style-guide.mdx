@@ -1,0 +1,309 @@
+---
+title: "Terraform Style Guide"
+description: "Module structure, naming conventions, state management, and the tools that keep it clean."
+date: 2026-04-10
+tags: ["terraform", "infrastructure", "iac"]
+---
+
+Consistent Terraform code is easier to review, debug, and hand over to the next person. Here's how we write it.
+
+## Project Structure
+
+```
+infra/
+├── environments/
+│   ├── staging/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── outputs.tf
+│   │   ├── terraform.tfvars
+│   │   └── backend.tf
+│   └── production/
+│       ├── main.tf
+│       ├── variables.tf
+│       ├── outputs.tf
+│       ├── terraform.tfvars
+│       └── backend.tf
+├── modules/
+│   ├── networking/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── outputs.tf
+│   │   └── README.md
+│   └── compute/
+│       ├── main.tf
+│       ├── variables.tf
+│       ├── outputs.tf
+│       └── README.md
+└── .terraform-version
+```
+
+### File Conventions
+
+| File | Purpose |
+|------|---------|
+| `main.tf` | Resources and data sources |
+| `variables.tf` | Input variable declarations |
+| `outputs.tf` | Output declarations |
+| `backend.tf` | State backend configuration |
+| `terraform.tfvars` | Variable values (environment-specific) |
+| `versions.tf` | Provider and Terraform version constraints |
+
+Keep files focused. If `main.tf` grows beyond 200 lines, split by resource type (`network.tf`, `compute.tf`, `iam.tf`).
+
+## Naming Conventions
+
+### Resources
+
+```hcl
+# Use underscores, not hyphens
+resource "aws_instance" "web_server" {}    # good
+resource "aws_instance" "web-server" {}    # bad
+
+# Name should describe what it is, not repeat the type
+resource "aws_security_group" "api" {}     # good
+resource "aws_security_group" "api_sg" {}  # bad - redundant suffix
+```
+
+### Variables
+
+```hcl
+# Descriptive names with type suffix where helpful
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "enable_monitoring" {
+  description = "Whether to enable detailed monitoring"
+  type        = bool
+  default     = false
+}
+
+variable "instance_count" {
+  description = "Number of instances to create"
+  type        = number
+  default     = 1
+}
+```
+
+Always include a `description`. Always include a `type`. Use `default` when there's a sensible one.
+
+### Tags
+
+Every resource that supports tags should have them:
+
+```hcl
+locals {
+  common_tags = {
+    Environment = var.environment
+    Project     = var.project
+    ManagedBy   = "terraform"
+    Owner       = var.owner
+  }
+}
+
+resource "aws_instance" "web" {
+  # ...
+  tags = merge(local.common_tags, {
+    Name = "${var.project}-web-${var.environment}"
+  })
+}
+```
+
+## Modules
+
+### When to Create a Module
+
+- You're repeating the same resources across environments
+- A group of resources logically belongs together
+- You want to enforce standards (e.g., all S3 buckets have encryption)
+
+Don't create a module for a single resource. That's just indirection.
+
+### Module Interface
+
+```hcl
+# modules/networking/variables.tf
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment name (staging, production)"
+  type        = string
+}
+
+variable "availability_zones" {
+  description = "List of AZs to use"
+  type        = list(string)
+}
+```
+
+```hcl
+# modules/networking/outputs.tf
+output "vpc_id" {
+  description = "ID of the created VPC"
+  value       = aws_vpc.main.id
+}
+
+output "private_subnet_ids" {
+  description = "IDs of the private subnets"
+  value       = aws_subnet.private[*].id
+}
+```
+
+### Module Documentation
+
+Use [terraform-docs](https://terraform-docs.io) to auto-generate README files:
+
+```bash
+terraform-docs markdown table modules/networking/ > modules/networking/README.md
+```
+
+## State Management
+
+### Remote State
+
+Always use remote state. Never commit `.tfstate` files.
+
+```hcl
+# backend.tf
+terraform {
+  backend "s3" {
+    bucket         = "gremlin-terraform-state"
+    key            = "staging/networking/terraform.tfstate"
+    region         = "eu-west-1"
+    dynamodb_table = "terraform-locks"
+    encrypt        = true
+  }
+}
+```
+
+### State Key Convention
+
+```
+<environment>/<component>/terraform.tfstate
+```
+
+Examples:
+- `staging/networking/terraform.tfstate`
+- `production/compute/terraform.tfstate`
+- `shared/dns/terraform.tfstate`
+
+### State Locking
+
+Always use DynamoDB (AWS) or equivalent for state locking. This prevents two people from applying at the same time.
+
+If you hit a stale lock:
+
+```bash
+# Check who holds it first
+terraform force-unlock <LOCK_ID>
+```
+
+Only force-unlock if you're certain no other process is running.
+
+## Tooling
+
+### tfenv
+
+Pin the Terraform version per project:
+
+```bash
+# .terraform-version
+1.9.8
+```
+
+tfenv auto-selects the right version when you enter the directory.
+
+### tflint
+
+Lint your code:
+
+```bash
+tflint --init
+tflint
+```
+
+Common catches: deprecated syntax, missing descriptions, unused variables.
+
+### tfsec
+
+Security scanning:
+
+```bash
+tfsec .
+```
+
+Catches: unencrypted S3 buckets, public security groups, missing logging.
+
+### terraform fmt
+
+Format before committing:
+
+```bash
+terraform fmt -recursive
+```
+
+This is non-negotiable. Unformatted Terraform code shouldn't pass review.
+
+## Patterns
+
+### Conditional Resources
+
+```hcl
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  count = var.enable_monitoring ? 1 : 0
+  # ...
+}
+```
+
+### Dynamic Blocks
+
+```hcl
+resource "aws_security_group" "api" {
+  name = "${var.project}-api"
+
+  dynamic "ingress" {
+    for_each = var.ingress_rules
+    content {
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      protocol    = "tcp"
+      cidr_blocks = ingress.value.cidr_blocks
+    }
+  }
+}
+```
+
+### Data Sources for Lookups
+
+```hcl
+# Look up the latest AMI instead of hardcoding
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-*-24.04-amd64-server-*"]
+  }
+}
+```
+
+## Review Checklist
+
+Before submitting a Terraform PR:
+
+- [ ] `terraform fmt -recursive` produces no changes
+- [ ] `tflint` passes with no errors
+- [ ] `tfsec` passes (or findings are acknowledged)
+- [ ] All variables have descriptions and types
+- [ ] Resources have appropriate tags
+- [ ] No hardcoded values that should be variables
+- [ ] `terraform plan` output is reviewed and expected
+- [ ] State key follows the naming convention
+- [ ] Module README is up to date (run `terraform-docs`)

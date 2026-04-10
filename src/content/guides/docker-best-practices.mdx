@@ -1,0 +1,285 @@
+---
+title: "Docker Best Practices"
+description: "Multi-stage builds, image security, size optimisation, and production patterns."
+date: 2026-04-10
+tags: ["docker", "containers", "security"]
+---
+
+We build and ship containers for clients regularly. Here's how we keep them small, fast, and secure.
+
+## Multi-Stage Builds
+
+Always use multi-stage builds. Your final image shouldn't contain build tools, source code, or dev dependencies.
+
+### Node.js / TypeScript
+
+```dockerfile
+# Build stage
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:22-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package.json ./
+USER node
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+### Python
+
+```dockerfile
+# Build stage
+FROM python:3.13-slim AS build
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
+RUN pip install uv && uv sync --frozen --no-dev
+COPY . .
+
+# Production stage
+FROM python:3.13-slim
+WORKDIR /app
+COPY --from=build /app/.venv ./.venv
+COPY --from=build /app/src ./src
+ENV PATH="/app/.venv/bin:$PATH"
+USER nobody
+EXPOSE 8000
+CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0"]
+```
+
+### Go
+
+```dockerfile
+FROM golang:1.23-alpine AS build
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /server ./cmd/server
+
+FROM scratch
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /server /server
+USER 65534
+EXPOSE 8080
+ENTRYPOINT ["/server"]
+```
+
+Go binaries can run from `scratch` (empty image). Final image is typically under 15MB.
+
+### Rust
+
+```dockerfile
+FROM rust:1.82-alpine AS build
+WORKDIR /app
+RUN apk add --no-cache musl-dev
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && echo "fn main() {}" > src/main.rs && cargo build --release && rm -rf src
+COPY . .
+RUN cargo build --release
+
+FROM scratch
+COPY --from=build /app/target/release/server /server
+USER 65534
+EXPOSE 8080
+ENTRYPOINT ["/server"]
+```
+
+The dummy `main.rs` trick caches dependency compilation.
+
+## Image Size
+
+Smaller images mean faster pulls, less storage, and smaller attack surface.
+
+### Use Alpine or Distroless Base Images
+
+```dockerfile
+# Good - Alpine (~5MB base)
+FROM node:22-alpine
+
+# Good - Distroless (~20MB, no shell, no package manager)
+FROM gcr.io/distroless/nodejs22-debian12
+
+# Avoid - Full Debian (~120MB base)
+FROM node:22
+```
+
+### Check Image Size
+
+```bash
+# See image size
+docker images myapp
+
+# Inspect layers with dive
+dive myapp:latest
+```
+
+### Common Size Wins
+
+- **Delete caches** after installing packages: `RUN apk add --no-cache ...`
+- **Combine RUN statements** to reduce layers
+- **Use `.dockerignore`** to exclude node_modules, .git, docs, tests
+
+### .dockerignore
+
+```
+.git
+.github
+node_modules
+dist
+*.md
+LICENSE
+.env*
+.vscode
+.idea
+tests
+docs
+```
+
+## Security
+
+### Run as Non-Root
+
+Never run containers as root in production:
+
+```dockerfile
+# Create a non-root user
+RUN addgroup -S app && adduser -S app -G app
+USER app
+
+# Or use the built-in nobody user
+USER nobody
+
+# Or use numeric UID (works with scratch/distroless)
+USER 65534
+```
+
+### Pin Base Image Versions
+
+```dockerfile
+# Good - pinned to minor version
+FROM node:22.12-alpine
+
+# OK - pinned to major version
+FROM node:22-alpine
+
+# Bad - floating tag, could change any time
+FROM node:latest
+```
+
+### Scan for Vulnerabilities
+
+```bash
+# Scan with Snyk
+snyk container test myapp:latest
+
+# Scan with Docker Scout
+docker scout cves myapp:latest
+
+# Scan with Trivy
+trivy image myapp:latest
+```
+
+Run scans in CI, not just locally.
+
+### Don't Store Secrets in Images
+
+```dockerfile
+# Bad - secret baked into image
+ENV API_KEY=sk-secret-123
+
+# Good - pass at runtime
+# docker run -e API_KEY=sk-secret-123 myapp
+```
+
+Use Docker secrets, environment variables at runtime, or 1Password `op run`.
+
+## Docker Compose
+
+For local development, use Compose:
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+```
+
+### Useful Commands
+
+```bash
+dc up -d          # start in background
+dc logs -f app    # follow logs
+dc down           # stop and remove
+dc build --no-cache  # rebuild from scratch
+dc exec app sh    # shell into running container
+```
+
+## Build Performance
+
+### Layer Caching
+
+Order your Dockerfile so things that change least are at the top:
+
+```dockerfile
+# 1. Base image (rarely changes)
+FROM node:22-alpine
+
+# 2. System dependencies (rarely changes)
+RUN apk add --no-cache curl
+
+# 3. App dependencies (changes when deps update)
+COPY package.json bun.lock ./
+RUN npm ci
+
+# 4. App source (changes most often)
+COPY . .
+RUN npm run build
+```
+
+### BuildKit
+
+Enable BuildKit for faster builds:
+
+```bash
+export DOCKER_BUILDKIT=1
+```
+
+Or in `~/.docker/daemon.json`:
+
+```json
+{
+  "features": {
+    "buildkit": true
+  }
+}
+```

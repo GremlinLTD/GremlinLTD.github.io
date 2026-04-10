@@ -1,0 +1,451 @@
+---
+title: "Dotfiles Guide"
+description: "Our recommended shell config, prompt setup, and terminal defaults. A solid starting point."
+date: 2026-04-10
+tags: ["shell", "terminal", "config"]
+---
+
+A reference for the dotfiles we recommend. Copy what works for you, ignore the rest.
+
+## Fish Config (~/.config/fish/config.fish)
+
+Fish is our recommended shell. Clean syntax, great defaults.
+
+```bash
+if status is-interactive
+    starship init fish | source
+    atuin init fish | source
+end
+
+# OrbStack integration
+source ~/.orbstack/shell/init2.fish 2>/dev/null; or :
+
+# bun
+set --export BUN_INSTALL "$HOME/.bun"
+set --export PATH $BUN_INSTALL/bin $PATH
+
+# 1Password CLI plugins (routes aws through 1Password)
+source ~/.config/op/plugins.sh
+
+# Aliases
+alias gs "git status"
+alias gd "git diff"
+alias gl "git log --oneline -20"
+alias gco "git checkout"
+alias gcb "git checkout -b"
+alias gp "git pull --rebase"
+alias k "kubectl"
+alias kgp "kubectl get pods"
+alias kgs "kubectl get svc"
+alias kns "kubectl config set-context --current --namespace"
+alias kctx "kubectl config use-context"
+alias dc "docker compose"
+alias dps 'docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias ll "ls -la"
+```
+
+## Zsh Config (~/.zshrc)
+
+If you prefer zsh:
+
+```bash
+# Atuin (better shell history)
+. "$HOME/.atuin/bin/env"
+eval "$(atuin init zsh)"
+
+# Starship prompt
+eval "$(starship init zsh)"
+
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# fzf keybindings and completion
+source <(fzf --zsh)
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# krew
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+# 1Password CLI plugins
+source ~/.config/op/plugins.sh
+
+# History
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+
+# Aliases - Git
+alias gs="git status"
+alias gd="git diff"
+alias gl="git log --oneline -20"
+alias gco="git checkout"
+alias gcb="git checkout -b"
+alias gp="git pull --rebase"
+
+# Aliases - Kubernetes
+alias k="kubectl"
+alias kgp="kubectl get pods"
+alias kgs="kubectl get svc"
+alias kgd="kubectl get deployments"
+alias kns="kubectl config set-context --current --namespace"
+alias kctx="kubectl config use-context"
+
+# Aliases - Docker
+alias dc="docker compose"
+alias dps="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+
+# Aliases - General
+alias ll="ls -la"
+alias ..="cd .."
+alias ...="cd ../.."
+```
+
+## Fish Plugins
+
+We use [Fisher](https://github.com/jorgebucaran/fisher) as the plugin manager:
+
+```bash
+brew install fisher
+```
+
+Recommended plugins (add to `~/.config/fish/fish_plugins`):
+
+```
+jethrokuan/z                          # directory jumping (like zoxide)
+franciscolourenco/done                # notification when long commands finish
+jorgebucaran/autopair.fish            # auto-close brackets and quotes
+jhillyerd/plugin-git                  # git abbreviations and completions
+gazorby/fish-abbreviation-tips        # shows when you could use an abbreviation
+nickeb96/puffer-fish                  # expand ... to ../.. and !! to last command
+patrickf1/colored_man_pages.fish      # coloured man pages
+eth-p/fish-plugin-sudo               # press Esc twice to prepend sudo
+edc/bass                              # run bash scripts in fish
+evanlucas/fish-kubectl-completions    # kubectl completions
+blackjid/plugin-kubectl               # kubectl abbreviations
+ankitsumitg/docker-fish-completions   # docker completions
+halostatue/fish-macos@v6              # macOS utilities (Finder, apps)
+halostatue/fish-rust                  # Rust/cargo completions
+```
+
+Install all plugins:
+
+```bash
+fisher update
+```
+
+### Fish Configuration Files
+
+Fish uses `conf.d/` for auto-loaded config. Useful files to create:
+
+**`~/.config/fish/conf.d/aliases.fish`** - tool aliases:
+
+```bash
+# Use modern replacements when available
+if type -q eza
+  alias ls='eza --icons'
+end
+
+if type -q nvim
+  alias vim='nvim'
+end
+```
+
+**`~/.config/fish/conf.d/paths.fish`** - PATH setup:
+
+```bash
+# Prefer GNU coreutils over macOS defaults
+fish_add_path --prepend /opt/homebrew/opt/coreutils/libexec/gnubin
+fish_add_path --prepend /opt/homebrew/opt/findutils/libexec/gnubin
+fish_add_path --prepend /opt/homebrew/opt/gawk/libexec/gnubin
+fish_add_path /Users/(whoami)/.local/bin
+```
+
+**`~/.config/fish/conf.d/editor.fish`** - editor defaults:
+
+```bash
+set -gx EDITOR "vim"
+set -gx VISUAL "code"
+```
+
+## Atuin (Shell History)
+
+[Atuin](https://atuin.sh) replaces your shell history with a searchable, syncable database. Much better than ctrl+r.
+
+```bash
+brew install atuin
+```
+
+Search history with `ctrl+r` or `up arrow`. It shows timestamps, exit codes, and duration. You can sync across machines if you want.
+
+## Starship Config (~/.config/starship.toml)
+
+```toml
+[character]
+success_symbol = ""
+error_symbol = "[](bold red)"
+
+[username]
+show_always = true
+style_user = 'white bold'
+style_root = 'red bold'
+
+[hostname]
+style = "bold dimmed blue"
+
+[directory]
+truncation_length = 4
+truncation_symbol = '…/'
+
+[git_branch]
+format = "[$branch]($style) "
+
+[git_metrics]
+disabled = false
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[git_status]
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+up_to_date = '✓'
+
+[status]
+symbol = "[](bold red)"
+success_symbol = ""
+format = '[$symbol$common_meaning$signal_name$maybe_int]($style) '
+map_symbol = true
+disabled = false
+
+[kubernetes]
+format = 'on [⛵ $context](dimmed green) '
+disabled = false
+
+[aws]
+symbol = ''
+
+[azure]
+symbol = '󰠅'
+
+[terraform]
+symbol = ''
+format = '[$symbol $version - $workspace]($style)'
+
+[helm]
+symbol = ''
+
+[rust]
+symbol = '󱘗'
+
+[nodejs]
+disabled = true
+
+[ruby]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[localip]
+ssh_only = false
+format = '[$localipv4](bold dimmed red) '
+disabled = false
+
+[[battery.display]]
+threshold = 15
+style = 'bold red'
+
+[[battery.display]]
+threshold = 30
+style = 'bold yellow'
+
+[[battery.display]]
+threshold = 50
+style = 'bold green'
+```
+
+This config shows git metrics (lines added/removed), Kubernetes context, cloud provider, battery level, and local IP. Nerd Font icons for AWS, Azure, Terraform, Helm, and Rust.
+
+## Git Config (~/.gitconfig)
+
+```ini
+[user]
+    name = Your Name
+    email = your.name@gremlin.group
+
+[init]
+    defaultBranch = main
+
+[push]
+    autoSetupRemote = true
+
+[branch]
+    autosetupmerge = true
+
+[pull]
+    rebase = true
+
+[fetch]
+    prune = true
+
+[gpg "ssh"]
+    program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+
+[commit]
+    gpgsign = true
+
+[core]
+    pager = delta
+    editor = vim
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    line-numbers = true
+
+[merge]
+    conflictstyle = zdiff3
+
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+
+[alias]
+    l = log --pretty=oneline -n 50 --graph --abbrev-commit
+    save = !git add -A && git commit -v -m 'SAVEPOINT'
+    undo = reset HEAD~1 --mixed
+    findcommit = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+    findmessage = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+```
+
+### Notable Settings
+
+- **`push.autoSetupRemote`** - automatically sets upstream when you push a new branch. No more `git push -u origin feature/thing`.
+- **`delta`** as the pager - syntax-highlighted, line-numbered diffs. Install with `brew install git-delta`.
+- **`merge.conflictstyle = zdiff3`** - shows the original text alongside both sides in merge conflicts. Makes resolving conflicts much easier.
+- **`url.insteadOf`** - forces SSH for all GitHub operations. No HTTPS auth prompts.
+- **`findcommit`** / **`findmessage`** - search git history by code content or commit message.
+
+### Per-Client Git Config
+
+Use `includeIf` to automatically switch your email and settings per client:
+
+```ini
+# ~/.gitconfig
+[includeIf "gitdir:~/git/gremlin/**"]
+    path = ~/git/gremlin/.gitconfig
+
+[includeIf "gitdir:~/git/clients/acme/**"]
+    path = ~/git/clients/acme/.gitconfig
+```
+
+```ini
+# ~/git/gremlin/.gitconfig
+[user]
+    email = your.name@gremlin.group
+```
+
+```ini
+# ~/git/clients/acme/.gitconfig
+[user]
+    email = your.name@acme.com
+```
+
+This means you never accidentally commit with the wrong email.
+
+## Commit Message Template (~/.gitmessage)
+
+Set up a commit template as a reminder:
+
+```bash
+git config --global commit.template ~/.gitmessage
+```
+
+```
+# <type>(<scope>): <subject> (max 50 chars)
+# |<----  Using a Maximum Of 50 Characters  ---->|
+
+
+# Explain why this change is being made
+# |<----  Try To Limit Each Line to a Maximum Of 72 Characters  ---->|
+
+# Provide links to any relevant tickets, articles or other resources
+# Example: Github issue #23
+
+# Types: feat fix refactor style docs test chore ci build perf revert
+```
+
+## Global Gitignore (~/.gitignore_global)
+
+```bash
+git config --global core.excludesfile ~/.gitignore_global
+```
+
+```
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+.env
+.env.local
+```
+
+## 1Password CLI Plugins
+
+1Password can wrap CLI tools so they authenticate through your vault:
+
+```bash
+# Set up the AWS plugin
+op plugin init aws
+
+# This creates ~/.config/op/plugins.sh which aliases aws through 1Password
+# Source it in your shell config:
+source ~/.config/op/plugins.sh
+```
+
+Now `aws` commands authenticate via 1Password with biometric approval. No plain-text credentials.
+
+## Managing Your Dotfiles
+
+We recommend [mackup](https://github.com/lra/mackup) to sync dotfiles via iCloud:
+
+```bash
+brew install mackup
+mackup backup    # backs up to iCloud
+mackup restore   # on a new machine
+```
+
+Mackup symlinks your config files to iCloud, so they stay in sync across machines automatically. It supports hundreds of applications out of the box.
+
+Alternatively, keep a git repo:
+
+```bash
+mkdir -p ~/git/dotfiles
+cd ~/git/dotfiles
+git init
+
+# Symlink configs
+ln -sf ~/git/dotfiles/config.fish ~/.config/fish/config.fish
+ln -sf ~/git/dotfiles/starship.toml ~/.config/starship.toml
+ln -sf ~/git/dotfiles/.gitconfig ~/.gitconfig
+```
