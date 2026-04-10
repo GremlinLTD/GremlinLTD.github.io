@@ -5,6 +5,12 @@ projects:
   hidden: []
 
 tools:
+  - name: homebrew
+    description: The missing package manager for macOS and Linux
+    url: https://brew.sh
+    install: '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    category: Package Managers
+
   - name: bun
     description: Fast JavaScript runtime, bundler, and package manager
     url: https://bun.sh
@@ -16,6 +22,18 @@ tools:
     url: https://github.com/astral-sh/uv
     install: "curl -LsSf https://astral.sh/uv/install.sh | sh"
     category: Package Managers
+
+  - name: cargo
+    description: Rust package manager and build tool, installed with rustup
+    url: https://doc.rust-lang.org/cargo/
+    install: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    category: Package Managers
+
+  - name: ghostty
+    description: Fast, native terminal emulator with GPU rendering
+    url: https://ghostty.org
+    install: "brew install --cask ghostty"
+    category: Shell & Terminal
 
   - name: starship
     description: Minimal, fast, customisable shell prompt
@@ -408,12 +426,6 @@ tools:
     category: General Utilities
 
   # Desktop Apps
-
-  - name: ghostty
-    description: Fast, native terminal emulator with GPU rendering
-    url: https://ghostty.org
-    install: "brew install --cask ghostty"
-    category: Desktop Apps
 
   - name: orbstack
     description: Fast, lightweight Docker Desktop alternative for macOS
