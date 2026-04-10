@@ -188,11 +188,15 @@ Search history with `ctrl+r` or `up arrow`. It shows timestamps, exit codes, and
 
 ## Starship Config (~/.config/starship.toml)
 
-```toml
-[character]
-success_symbol = ""
-error_symbol = "[](bold red)"
+Needs a [Nerd Font](https://www.nerdfonts.com/) installed (JetBrainsMono or FiraCode). Without one the icons will show as boxes.
 
+```toml
+# --- Prompt character ---
+[character]
+success_symbol = ""                    # clean prompt on success
+error_symbol = "[](bold red)"         # red cross on error
+
+# --- User / host ---
 [username]
 show_always = true
 style_user = 'white bold'
@@ -201,12 +205,20 @@ style_root = 'red bold'
 [hostname]
 style = "bold dimmed blue"
 
+[localip]
+ssh_only = false                        # show IP even when not SSHed in
+format = '[$localipv4](bold dimmed red) '
+disabled = false
+
+# --- Directory ---
 [directory]
 truncation_length = 4
 truncation_symbol = '…/'
 
+# --- Git ---
 [git_branch]
-format = "[$branch]($style) "
+symbol = " "                           # nerd font git branch icon
+format = "[$symbol$branch]($style) "
 
 [git_metrics]
 disabled = false
@@ -219,6 +231,7 @@ diverged = '⇕⇡${ahead_count}⇣${behind_count}'
 behind = '⇣${count}'
 up_to_date = '✓'
 
+# --- Exit status ---
 [status]
 symbol = "[](bold red)"
 success_symbol = ""
@@ -226,40 +239,45 @@ format = '[$symbol$common_meaning$signal_name$maybe_int]($style) '
 map_symbol = true
 disabled = false
 
+# --- Cloud & infra ---
 [kubernetes]
-format = 'on [⛵ $context](dimmed green) '
+symbol = '☸ '                           # helm wheel
+format = '[$symbol$context( \($namespace\))](dimmed green) '
 disabled = false
 
 [aws]
-symbol = ''
+symbol = ' '                           # nerd font AWS icon
 
 [azure]
-symbol = '󰠅'
+symbol = '󰠅 '                          # nerd font Azure icon
 
 [terraform]
-symbol = ''
-format = '[$symbol $version - $workspace]($style)'
+symbol = ' '                          # nerd font Terraform icon
+format = '[$symbol$version - $workspace]($style) '
 
 [helm]
-symbol = ''
+symbol = ' '                          # nerd font Helm icon
 
+# --- Languages ---
 [rust]
-symbol = '󱘗'
+symbol = '󱘗 '                          # nerd font Rust icon
+
+[python]
+symbol = ' '                           # nerd font Python icon
+
+[golang]
+symbol = ' '                           # nerd font Go icon
 
 [nodejs]
-disabled = true
+disabled = true                         # we use bun, not node
 
 [ruby]
 disabled = true
 
 [gcloud]
-disabled = true
+disabled = true                         # too noisy, we don't use it much
 
-[localip]
-ssh_only = false
-format = '[$localipv4](bold dimmed red) '
-disabled = false
-
+# --- Battery ---
 [[battery.display]]
 threshold = 15
 style = 'bold red'
@@ -273,7 +291,7 @@ threshold = 50
 style = 'bold green'
 ```
 
-This config shows git metrics (lines added/removed), Kubernetes context, cloud provider, battery level, and local IP. Nerd Font icons for AWS, Azure, Terraform, Helm, and Rust.
+Shows: git branch with icon and metrics (lines added/removed), Kubernetes context with namespace, cloud provider (AWS/Azure), Terraform workspace, battery warnings, and local IP. Uses nerd font icons throughout so the prompt stays compact.
 
 ## Git Config (~/.gitconfig)
 
