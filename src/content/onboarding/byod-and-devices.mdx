@@ -1,0 +1,78 @@
+---
+title: "BYOD & Device Setup"
+description: "Bring your own device policy, MDM enrolment, and keeping client data safe"
+step: 2
+---
+
+You can use your own machine or a company-provided one. If you're a contractor, BYOD is the default.
+
+## Permanent Staff
+
+You get a £5,000 budget for setting up your home office. That covers your laptop, monitor, keyboard, chair, whatever you need to do your best work. Talk to your team lead about how to claim it.
+
+## Contractors
+
+Bring your own device. The requirements below still apply, you'll need to enrol in MDM and follow the same security baseline.
+
+## Device Requirements
+
+Whatever you use, it needs to meet these:
+
+- **macOS or Linux** (Windows with WSL2 is tolerated but not officially supported)
+- **FileVault / full disk encryption** enabled
+- **Firewall** enabled
+- **macOS kept up to date** (no more than one major version behind)
+- **Screen lock** set to activate after 5 minutes or less
+- **Firmware password / secure boot** enabled where supported
+
+## MDM Enrolment (Mosyle)
+
+We use [Mosyle](https://business.mosyle.com) for device management. This isn't about surveillance, it's about being able to protect client data if a device is lost or compromised.
+
+### What MDM does
+
+- Enforces the security baseline above (encryption, firewall, screen lock)
+- Pushes Wi-Fi and VPN profiles
+- Allows remote wipe of company/client data if the device is lost or stolen
+- Distributes required certificates and profiles
+
+### What MDM does NOT do
+
+- Track your location
+- Monitor your screen or keystrokes
+- Access your personal files, photos, or browsing history
+- Install software without your knowledge
+
+### How to enrol
+
+Your team lead will send you an enrolment link. On macOS:
+
+1. Open the enrolment link in Safari (not Chrome)
+2. Download and install the MDM profile when prompted
+3. Approve the profile in **System Settings > Profiles**
+4. Mosyle will verify your security settings and flag anything that needs fixing
+
+The whole process takes about 5 minutes. If anything fails, it's usually because FileVault isn't enabled or the firewall is off.
+
+## Keeping Data Off Personal Storage
+
+We handle client infrastructure and sometimes sensitive data. The rules are simple:
+
+- **Don't store client data locally** if you can avoid it. Use the tools (Tailscale, cloud consoles, remote dev environments) instead.
+- **Don't copy client data** to personal cloud storage (iCloud, Google Drive, Dropbox).
+- **Use 1Password** for credentials, not your browser's password manager or a text file.
+- **Git repos are fine** on your local machine, that's how you work. Just don't commit secrets.
+- **If a device is lost or stolen**, tell your team lead immediately so we can trigger a remote wipe of company data.
+
+## When You Leave
+
+When you roll off a project or leave Gremlin:
+
+- Remove client repos and credentials from your machine
+- Revoke any personal access tokens you created
+- Your team lead will remove your device from MDM
+- If you had a company-provided device, return it
+
+## Next Steps
+
+Continue to [Shell & Dotfiles](/onboarding/shell-and-dotfiles/) to set up your terminal.
