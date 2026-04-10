@@ -8,7 +8,7 @@ const repos = await fetchPublicRepos();
 <BaseLayout title="Projects" description="Open source projects from Gremlin LTD">
   <div class="container page-section">
     <h1>Projects</h1>
-    <p class="page-lead">Our open source work. Tools, libraries, and infrastructure components.</p>
+    <p class="page-lead">Public repos from the GremlinLTD org. Pinned ones first, then most recently updated.</p>
 
     <div class="projects-grid">
       {repos.map(repo => (
