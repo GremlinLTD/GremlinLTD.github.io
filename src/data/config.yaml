@@ -399,6 +399,12 @@ tools:
     install: "brew install wireguard-tools"
     category: Security
 
+  - name: tailscale
+    description: Mesh VPN for accessing internal tools and dev environments
+    url: https://tailscale.com
+    install: "brew install --cask tailscale"
+    category: Networking
+
   # General Utilities (additional)
 
   - name: topgrade

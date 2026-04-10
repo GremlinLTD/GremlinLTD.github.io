@@ -143,6 +143,29 @@ docker version
 docker compose version
 ```
 
+## Tailscale
+
+We use [Tailscale](https://tailscale.com) heavily for accessing internal tools, dev environments, and client infrastructure that isn't exposed to the public internet. Think of it as a VPN that just works.
+
+```bash
+brew install --cask tailscale
+```
+
+Open Tailscale from your menu bar and sign in with your Gremlin account. Once connected, you'll be able to reach internal services by hostname (e.g. `grafana.tail1234.ts.net`) without any port forwarding or VPN client fiddling.
+
+### What's on Tailscale
+
+- Internal dashboards and monitoring
+- Dev/staging environments
+- Shared databases and services
+- SSH access to infrastructure that isn't publicly routable
+
+Your team lead will add your device to the right ACL groups when you join. If you can't reach something, check that Tailscale is connected (menu bar icon should be active) and ask if you've been added to the right group.
+
+### Multiple Devices
+
+Tailscale works across your laptop, phone, and any VMs or containers you need to reach. Install it on anything that needs access to the internal network.
+
 ## Infrastructure Repos
 
 Key repos to clone:
