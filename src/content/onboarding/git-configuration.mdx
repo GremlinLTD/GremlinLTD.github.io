@@ -27,26 +27,19 @@ git config --global pull.rebase true
 
 ## Commit Signing
 
-We sign commits with SSH keys. This verifies you are who you say you are.
+We sign commits with SSH keys via 1Password. This verifies you are who you say you are, with no manual key management.
 
-### Set up SSH signing
+See the [Security Practices](/onboarding/security-practices/) guide for full 1Password SSH agent and commit signing setup. The short version:
 
 ```bash
-# Use your existing SSH key for signing
 git config --global gpg.format ssh
-git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+git config --global user.signingkey "ssh-ed25519 AAAA..."  # your public key from 1Password
 git config --global commit.gpgsign true
 git config --global tag.gpgsign true
 ```
 
-### Add your signing key to GitHub
-
-1. Go to [GitHub SSH Keys](https://github.com/settings/keys)
-2. Click "New SSH key"
-3. Set type to **Signing Key**
-4. Paste your public key (`cat ~/.ssh/id_ed25519.pub`)
-
-Your commits will now show as "Verified" on GitHub.
+Add your public key to [GitHub SSH Keys](https://github.com/settings/keys) as both an Authentication Key and a Signing Key. Your commits will show as "Verified" on GitHub.
 
 ## Branch Conventions
 

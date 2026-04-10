@@ -6,72 +6,109 @@ step: 8
 
 We handle client infrastructure. Security isn't optional.
 
-## SSH Keys
+## 1Password
 
-Generate an Ed25519 key if you don't already have one:
+We use [1Password](https://1password.com/) as our central security tool. It handles passwords, secrets, SSH keys, and commit signing. You'll receive an invitation to the team vault.
 
-```bash
-ssh-keygen -t ed25519 -C "your.name@gremlin.group"
-```
-
-Add it to the SSH agent:
+### Install
 
 ```bash
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_ed25519
+brew install --cask 1password
+brew install --cask 1password-cli
 ```
 
-On macOS, add to your `~/.ssh/config` so it persists across reboots:
+Enable the 1Password CLI integration in **1Password > Settings > Developer > Integrate with 1Password CLI**.
+
+### SSH Agent
+
+1Password has a built-in SSH agent. Instead of managing keys manually, let 1Password handle it.
+
+**Enable it:**
+
+1. Open **1Password > Settings > Developer**
+2. Turn on **Use the SSH agent**
+3. Turn on **Authorize SSH keys for Git operations**
+
+**Configure your SSH config** (`~/.ssh/config`):
 
 ```
 Host *
-  AddKeysToAgent yes
-  UseKeychain yes
-  IdentityFile ~/.ssh/id_ed25519
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 ```
 
-Add your public key to:
-- [GitHub](https://github.com/settings/keys) (both Authentication and Signing)
-- Any client systems you're given access to
+**Create an SSH key in 1Password:**
 
-## Two-Factor Authentication
+1. In 1Password, create a new **SSH Key** item
+2. Choose **Ed25519** as the key type
+3. Give it a title like "GitHub - Work"
+4. Copy the public key
 
-Enable 2FA on everything. No exceptions.
+**Add to GitHub:**
 
-- **GitHub** - Required for org membership
-- **AWS** - Required for all IAM users
-- **Azure / GCP** - Required where available
-- **1Password** - Your master password + 2FA device
+1. Go to [GitHub SSH Keys](https://github.com/settings/keys)
+2. Add the public key as both an **Authentication Key** and a **Signing Key**
 
-Use a hardware key (YubiKey) or authenticator app. Avoid SMS-based 2FA.
+When you `git push` or `ssh` to a server, 1Password will prompt for biometric approval. No more `ssh-add` or managing key files.
 
-## 1Password
+### Commit Signing with SSH via 1Password
 
-We use [1Password](https://1password.com/) for team secrets management. You'll receive an invitation to the team vault.
+Use the same SSH key stored in 1Password to sign your commits:
+
+```bash
+# Use SSH for commit signing
+git config --global gpg.format ssh
+
+# Point to the 1Password SSH agent signing program
+git config --global gpg.ssh.program "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+# Set your signing key (paste your public key from 1Password)
+git config --global user.signingkey "ssh-ed25519 AAAA..."
+
+# Sign all commits and tags by default
+git config --global commit.gpgsign true
+git config --global tag.gpgsign true
+```
+
+Every commit will now be signed via 1Password with biometric approval. No GPG keychain to manage, no passphrase to remember.
+
+**Verify it works:**
+
+```bash
+echo "test" | ssh-keygen -Y sign -f ~/.ssh/id_ed25519 -n test 2>/dev/null || echo "Using 1Password agent"
+git commit --allow-empty -m "test: verify commit signing"
+git log --show-signature -1
+```
+
+Your commits will show as "Verified" on GitHub.
 
 ### CLI Integration
 
 The 1Password CLI lets you inject secrets into commands without exposing them:
 
 ```bash
-brew install --cask 1password-cli
-```
-
-Sign in:
-
-```bash
+# Sign in (or use biometric unlock)
 eval $(op signin)
-```
 
-Inject secrets into environment variables:
-
-```bash
 # Reference a secret from 1Password
 export API_KEY=$(op read "op://Private/API Key/credential")
 
 # Or use op run to inject into a command
 op run --env-file=.env.1p -- bun run dev
 ```
+
+### Plugin for AWS, GitHub, etc.
+
+1Password can manage CLI credentials for cloud tools:
+
+```bash
+# Set up the 1Password shell plugin for AWS
+op plugin init aws
+
+# Now aws commands authenticate through 1Password
+aws sts get-caller-identity
+```
+
+Supported plugins include AWS, GitHub CLI, Stripe, and more. See `op plugin list` for the full list.
 
 ### .env Files
 
@@ -83,7 +120,28 @@ DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 API_KEY=your-api-key-here
 ```
 
-For local development, create `.env` from the example and fill in real values from 1Password.
+For local development, create `.env` from the example and fill in real values from 1Password. Or better, use `op run` with a `.env.1p` file that references 1Password items directly:
+
+```bash
+# .env.1p
+DATABASE_URL=op://Development/Database/connection-string
+API_KEY=op://Development/API/credential
+```
+
+```bash
+op run --env-file=.env.1p -- bun run dev
+```
+
+## Two-Factor Authentication
+
+Enable 2FA on everything. No exceptions.
+
+- **GitHub** - Required for org membership
+- **AWS** - Required for all IAM users
+- **Azure / GCP** - Required where available
+- **1Password** - Your master password + biometric
+
+Use 1Password to store TOTP codes, or a hardware key (YubiKey) for critical accounts. Avoid SMS-based 2FA.
 
 ## Secrets in Code
 
