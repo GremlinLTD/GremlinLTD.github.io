@@ -11,27 +11,44 @@ We build and ship containers for clients regularly. Here's how we keep them smal
 
 Always use multi-stage builds. Your final image shouldn't contain build tools, source code, or dev dependencies.
 
-### Node.js / TypeScript
+### Bun (TypeScript / JavaScript)
 
 ```dockerfile
 # Build stage
-FROM node:22-alpine AS build
+FROM oven/bun:1-alpine AS build
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN npm ci
+RUN bun install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN bun run build
 
 # Production stage
-FROM node:22-alpine
+FROM oven/bun:1-alpine
 WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY package.json ./
-USER node
+USER bun
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+CMD ["bun", "run", "dist/index.js"]
 ```
+
+### Deno (TypeScript / JavaScript)
+
+```dockerfile
+FROM denoland/deno:alpine AS build
+WORKDIR /app
+COPY . .
+RUN deno compile --allow-net --allow-read --output server src/server.ts
+
+FROM scratch
+COPY --from=build /app/server /server
+USER 65534
+EXPOSE 8000
+ENTRYPOINT ["/server"]
+```
+
+Deno's `compile` produces a single binary that runs from `scratch`, like Go and Rust. See the [JavaScript Runtimes](/guides/javascript-runtimes/) guide for when to use Bun vs Deno.
 
 ### Python
 
@@ -101,15 +118,18 @@ Smaller images mean faster pulls, less storage, and smaller attack surface.
 ### Use Alpine or Distroless Base Images
 
 ```dockerfile
-# Good - Alpine (~5MB base)
+# Best - Bun Alpine (~100MB) or Deno Alpine (~130MB)
+FROM oven/bun:1-alpine
+FROM denoland/deno:alpine
+
+# OK - Node Alpine if you must (~180MB)
 FROM node:22-alpine
 
-# Good - Distroless (~20MB, no shell, no package manager)
-FROM gcr.io/distroless/nodejs22-debian12
-
-# Avoid - Full Debian (~120MB base)
+# Avoid - Full Debian (~300MB+)
 FROM node:22
 ```
+
+See the [JavaScript Runtimes](/guides/javascript-runtimes/) guide for why we prefer Bun and Deno over Node.
 
 ### Check Image Size
 

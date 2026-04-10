@@ -1,0 +1,167 @@
+---
+title: "JavaScript Runtimes: Bun vs Deno vs Node"
+description: "When to use which runtime, and why we default to Bun."
+date: 2026-04-10
+tags: ["javascript", "typescript", "bun", "deno", "node"]
+---
+
+We have three JavaScript/TypeScript runtimes available. Here's how we think about them.
+
+## The Short Version
+
+**Default to Bun.** Use Deno when its security model or standard library matters. Avoid Node unless a dependency requires it.
+
+## Bun
+
+Our primary runtime. Fast, batteries-included, and handles most workloads well.
+
+**Use Bun for:**
+- Web applications and APIs
+- Package management (`bun install` over `npm`)
+- Running TypeScript directly (no build step)
+- Scripts and tooling
+- Testing (`bun test`)
+- Docker images (smaller, faster than Node)
+
+**Strengths:**
+- Dramatically faster installs and startup than Node
+- Native TypeScript and JSX support
+- Built-in test runner, bundler, and package manager
+- Drop-in Node.js compatibility for most packages
+- SQLite built in
+
+```bash
+# Create a new project
+bun init
+
+# Install dependencies
+bun install
+
+# Run TypeScript directly
+bun run src/index.ts
+
+# Run tests
+bun test
+```
+
+## Deno
+
+A secure-by-default runtime with excellent TypeScript support and a strong standard library.
+
+**Use Deno for:**
+- Security-sensitive workloads (permissions model)
+- Projects that benefit from the standard library
+- Edge/serverless functions (Deno Deploy)
+- Scripts that need web-standard APIs
+- When you want no `node_modules` or `package.json`
+
+**Strengths:**
+- Permissions system (explicit network, file, env access)
+- Built-in formatter, linter, test runner
+- Web-standard APIs (fetch, Web Crypto, Streams)
+- URL imports (no package manager required)
+- First-class Jupyter notebook support
+
+```bash
+# Run with explicit permissions
+deno run --allow-net --allow-read src/server.ts
+
+# Run with all permissions (dev only)
+deno run -A src/server.ts
+
+# Format and lint
+deno fmt
+deno lint
+```
+
+## Node.js
+
+The incumbent. We avoid it for new projects unless there's a specific reason.
+
+**Use Node only when:**
+- A critical dependency doesn't work with Bun or Deno
+- A client project is already on Node and migration isn't in scope
+- A framework explicitly requires it (some edge cases)
+
+If you must use Node, use the LTS version and manage with `nvm` or `fnm`.
+
+## Docker Images
+
+Use Bun or Deno base images instead of Node. They produce smaller, faster containers.
+
+### Bun
+
+```dockerfile
+FROM oven/bun:1-alpine AS build
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+COPY . .
+RUN bun run build
+
+FROM oven/bun:1-alpine
+WORKDIR /app
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY package.json ./
+USER bun
+EXPOSE 3000
+CMD ["bun", "run", "dist/index.js"]
+```
+
+### Deno
+
+```dockerfile
+FROM denoland/deno:alpine AS build
+WORKDIR /app
+COPY . .
+RUN deno compile --allow-net --allow-read --output server src/server.ts
+
+FROM scratch
+COPY --from=build /app/server /server
+USER 65534
+EXPOSE 8000
+ENTRYPOINT ["/server"]
+```
+
+Deno's `compile` produces a single binary that can run from `scratch`, similar to Go and Rust.
+
+### Comparison
+
+| | Bun Alpine | Deno Alpine | Node Alpine |
+|---|---|---|---|
+| Base image size | ~100MB | ~130MB | ~180MB |
+| Install speed | Very fast | No install step | Slow |
+| TypeScript | Native | Native | Needs build step |
+| Final image (compiled) | N/A | ~50MB (scratch) | N/A |
+
+## Decision Matrix
+
+| Factor | Bun | Deno | Node |
+|--------|-----|------|------|
+| Speed | Fastest | Fast | Baseline |
+| TypeScript | Native | Native | Needs tsc/tsx |
+| Package compat | Very high | High (npm: imports) | Full |
+| Security model | Standard | Permissions | Standard |
+| Docker image size | Small | Smallest (compiled) | Largest |
+| Maturity | Growing | Growing | Mature |
+| Our default | Yes | For specific use cases | Legacy only |
+
+## In Practice
+
+For a new API or web app, start with:
+
+```bash
+bun init
+bun add hono     # or whatever framework
+bun run dev
+```
+
+If you need sandboxed execution or the Deno standard library:
+
+```bash
+deno init
+deno run --allow-net src/main.ts
+```
+
+If a client project is already on Node, work within their stack. Don't introduce a runtime migration as a side quest.
