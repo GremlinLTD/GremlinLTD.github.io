@@ -8,18 +8,17 @@ We're spread across client projects and internal work. We default to async, and 
 
 ## Async First
 
-We work asynchronously wherever possible. That means:
+Write it down instead of scheduling a call. A Slack message or GitHub comment beats a meeting almost every time. People are across timezones, on different client projects, or heads-down on something. Don't expect instant replies, give it a few hours.
 
-- **Write it down instead of scheduling a call.** A Slack message, a GitHub comment, or a short doc beats a meeting most of the time.
-- **Don't expect instant replies.** People are in different timezones, on different client projects, or doing deep work. Give it a few hours before following up.
-- **Make messages self-contained.** Include enough context that someone can respond without asking three clarifying questions. Links, screenshots, error messages, what you've already tried.
-- **Use threads.** Keep conversations threaded so people can catch up without scrolling through noise.
+When you do write, include enough context that someone can actually respond. Links, screenshots, error messages, what you've tried. "It's broken" is not a message. "The API returns 403 when I hit /users with this token, here's the request" is.
 
-Calls and huddles are for things that genuinely need real-time discussion: incident response, tricky architectural decisions, or anything where you've gone back and forth three times in text and still aren't aligned.
+Use threads. Nobody wants to scroll past 40 unthreaded messages to find the thing they need to reply to.
+
+Save calls for things that aren't working in text. If you've gone back and forth three times and you're still not aligned, jump on a huddle and sort it out.
 
 ## How We Work
 
-Most of the team is assigned to client projects at any given time. Some work on internal projects like our open source tools and infrastructure. Either way, the same conventions apply.
+Most of the team is on client projects at any given time. Some work on internal stuff like our open source tools and infrastructure. Same rules either way.
 
 ### Client Projects
 
@@ -36,11 +35,9 @@ Most of the team is assigned to client projects at any given time. Some work on 
 
 ## Communication Channels
 
-### Day-to-Day
+### Day-to-day
 
-- **Slack / Teams** - async updates, questions, sharing context. Use threads.
-- **GitHub PRs** - code discussion stays in the PR, not in chat
-- **Huddles / calls** - last resort for things that aren't resolving in text
+Slack or Teams for async stuff. GitHub PRs for code discussion (keep it in the PR, not in chat). Calls when text isn't cutting it.
 
 ### Escalation
 
@@ -50,30 +47,15 @@ If something is urgent:
 2. If they're unavailable, post in the engineering channel with context
 3. For production incidents, follow the client's incident process
 
-### When to Communicate
+### When to speak up
 
-- **Starting work** - let the team know what you're picking up
-- **Blocked** - say so early, don't wait until the end of the day
-- **Finished** - post the PR link and tag a reviewer
-- **Leaving for the day** - quick status update if you have work in progress
-- **Going to be away** - let your team lead and client contact know in advance
+Let the team know when you pick something up, when you're blocked, and when a PR is ready for review. If you're stuck, say so early rather than sitting on it until end of day. If you're going to be away, give your team lead and any client contacts a heads up.
 
 ## Documentation
 
-### Write Things Down
+If you spent time figuring something out, write it down. A runbook, an ADR, a README update, whatever fits. Don't assume the next person has your context, because they won't.
 
-If you spent time figuring something out, document it. Future you (and the next person) will thank you.
-
-- **Runbooks** - how to deploy, how to debug, how to recover
-- **Architecture decisions** - why we chose X over Y, as an ADR or in the project wiki
-- **Setup instructions** - don't assume the next person has your context
-
-### Where to Document
-
-- **Project README** - setup, running, testing
-- **`docs/` folder** - architecture, decisions, runbooks
-- **This site** - guides and references that apply across projects
-- **Client's wiki** - client-specific documentation stays with the client
+Project-specific docs go in the repo (`docs/` folder or README). Cross-project stuff goes on this site. Client-specific docs stay with the client.
 
 ## Meetings
 
@@ -118,13 +100,9 @@ Be honest. Retros only work if people speak up.
 - Respond to review feedback within a working day
 - Don't let PRs sit open for more than 2-3 days
 
-## Working Hours
+## Working hours
 
-We're flexible. The key principles:
-
-- **Overlap** - be available during core hours (roughly 10am-4pm UK) for collaboration
-- **Respect timezones** - if working with a client in a different timezone, agree on overlap hours
-- **Don't burn out** - sustainable pace matters more than heroic sprints
+Flexible. Be around roughly 10am-4pm UK so there's overlap for the async stuff to actually flow. If you're working with a client in a different timezone, agree on overlap hours with them. Don't burn yourself out doing heroic sprints. Sustainable pace is the point.
 
 ## Next Steps
 
