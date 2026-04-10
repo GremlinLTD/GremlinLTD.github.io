@@ -143,6 +143,19 @@ Enable 2FA on everything. No exceptions.
 
 Use 1Password to store TOTP codes, or a hardware key (YubiKey) for critical accounts. Avoid SMS-based 2FA.
 
+### YubiKeys
+
+We keep a stock of YubiKeys available for the team. If you need one for 1Password, AWS, GitHub, or other critical infrastructure, ask your team lead. We'll get one shipped to you.
+
+YubiKeys are recommended for:
+
+- **1Password** - use as a hardware security key for your vault
+- **AWS root accounts** - hardware MFA for root access
+- **GitHub** - passkey or security key authentication
+- **Any client system** that supports FIDO2/WebAuthn
+
+Once you have your YubiKey, register it with your accounts as a security key. Always register at least two methods (YubiKey + 1Password TOTP) so you're not locked out if you lose the key.
+
 ## Secrets in Code
 
 ### What NOT to commit
